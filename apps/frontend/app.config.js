@@ -28,6 +28,11 @@ module.exports = {
       package: 'com.fruitzy.app',
       edgeToEdgeEnabled: true,
       predictiveBackGestureEnabled: false,
+      enableProguardInReleaseBuilds: true,
+      enableShrinkResourcesInReleaseBuilds: true,
+      compileSdkVersion: 34,
+      targetSdkVersion: 34,
+      minSdkVersion: 23,
     },
     web: {
       favicon: './assets/favicon.png',

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import {
   View,
   Text,
@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   ScrollView,
   ActivityIndicator,
+  StyleSheet,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '../../theme/ThemeContext';
@@ -33,10 +34,23 @@ export const SignInScreen: React.FC<SignInScreenProps> = ({
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const passwordInputRef = useRef<TextInput>(null);
+
+  // Email validation helper
+  const isValidEmail = (email: string) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email.trim());
+  };
 
   const handleEmailSignIn = async () => {
+    // Validation
     if (!email || !password) {
       showToast('Please enter email and password', { type: 'error' });
+      return;
+    }
+
+    if (!isValidEmail(email)) {
+      showToast('Please enter a valid email address', { type: 'error' });
       return;
     }
 
@@ -46,7 +60,7 @@ export const SignInScreen: React.FC<SignInScreenProps> = ({
 
     try {
       const result = await signIn.create({
-        identifier: email.trim(),
+        identifier: email.trim().toLowerCase(),
         password,
       });
 
@@ -62,101 +76,216 @@ export const SignInScreen: React.FC<SignInScreenProps> = ({
       console.error('❌ Sign in error:', error);
       
       let errorMessage = 'Invalid email or password';
+      let isUserNotFound = false;
 
+      // Check if user doesn't exist - comprehensive error detection
       if (error.errors && error.errors[0]) {
-        errorMessage = error.errors[0].message;
+        const errorCode = error.errors[0].code;
+        const errorMsg = error.errors[0].message?.toLowerCase() || '';
+        
+        // Clerk error codes/messages that indicate user doesn't exist
+        if (
+          errorCode === 'form_identifier_not_found' ||
+          errorCode === 'form_password_incorrect' ||
+          errorCode === 'form_identifier_not_found_or_password_incorrect' ||
+          errorMsg.includes("couldn't find your account") ||
+          errorMsg.includes('not found') ||
+          errorMsg.includes("doesn't exist") ||
+          errorMsg.includes('no account found') ||
+          errorMsg.includes('identifier not found') ||
+          errorMsg.includes('user not found') ||
+          errorMsg.includes('account does not exist')
+        ) {
+          isUserNotFound = true;
+          errorMessage = 'Please signup first';
+        } else {
+          errorMessage = error.errors[0].message || errorMessage;
+        }
       } else if (error.message) {
-        errorMessage = error.message;
+        const errorMsg = error.message.toLowerCase();
+        if (
+          errorMsg.includes("couldn't find your account") ||
+          errorMsg.includes('not found') ||
+          errorMsg.includes("doesn't exist") ||
+          errorMsg.includes('no account found') ||
+          errorMsg.includes('identifier not found') ||
+          errorMsg.includes('user not found') ||
+          errorMsg.includes('account does not exist')
+        ) {
+          isUserNotFound = true;
+          errorMessage = 'Please signup first';
+        } else {
+          errorMessage = error.message;
+        }
       }
 
-      showToast(errorMessage, { type: 'error' });
+      showToast(errorMessage, { type: isUserNotFound ? 'neutral' : 'error' });
     } finally {
       setLoading(false);
     }
   };
 
+  const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: theme.background,
+    },
+    scrollContent: {
+      flexGrow: 1,
+      paddingHorizontal: 24,
+    },
+    backButton: {
+      width: 40,
+      height: 40,
+      borderRadius: 20,
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginTop: 16,
+      backgroundColor: theme.backgroundCard,
+    },
+    backButtonText: {
+      fontSize: 20,
+      color: theme.text,
+    },
+    content: {
+      flex: 1,
+      justifyContent: 'center',
+      paddingVertical: 32,
+    },
+    title: {
+      fontSize: 30,
+      fontFamily: 'Poppins_700Bold',
+      marginBottom: 8,
+      color: theme.heading,
+    },
+    subtitle: {
+      fontSize: 16,
+      fontFamily: 'Inter_400Regular',
+      marginBottom: 32,
+      color: theme.textSecondary,
+    },
+    inputContainer: {
+      marginBottom: 16,
+    },
+    inputLabel: {
+      fontSize: 14,
+      fontFamily: 'Poppins_500Medium',
+      marginBottom: 8,
+      color: theme.text,
+    },
+    passwordInputContainer: {
+      marginBottom: 24,
+    },
+    inputWrapper: {
+      position: 'relative',
+    },
+    input: {
+      width: '100%',
+      paddingHorizontal: 16,
+      paddingVertical: 16,
+      borderRadius: 12,
+      fontFamily: 'Inter_400Regular',
+      backgroundColor: theme.backgroundCard,
+      color: theme.text,
+      borderWidth: 1,
+      borderColor: theme.border,
+    },
+    passwordToggle: {
+      position: 'absolute',
+      right: 16,
+      top: 16,
+    },
+    signInButton: {
+      width: '100%',
+      paddingVertical: 16,
+      borderRadius: 25,
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginBottom: 16,
+      backgroundColor: theme.primary,
+    },
+    signInButtonText: {
+      fontSize: 16,
+      fontFamily: 'Poppins_600SemiBold',
+      color: '#FFFFFF',
+    },
+    linkContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginTop: 16,
+    },
+    linkText: {
+      fontSize: 16,
+      fontFamily: 'Inter_400Regular',
+      color: theme.textSecondary,
+    },
+    linkButtonText: {
+      fontSize: 16,
+      fontFamily: 'Poppins_600SemiBold',
+      color: theme.primary,
+    },
+  });
+
   return (
-    <SafeAreaView className="flex-1" style={{ backgroundColor: theme.background }}>
-      <ScrollView contentContainerStyle={{ flexGrow: 1 }} className="px-6">
+    <SafeAreaView style={styles.container}>
+      <ScrollView contentContainerStyle={styles.scrollContent}>
         {/* Back Button */}
-        <TouchableOpacity
-          className="w-10 h-10 rounded-full items-center justify-center mt-4"
-          style={{ backgroundColor: theme.backgroundCard }}
-          onPress={onBack}
-        >
-          <Text className="text-xl" style={{ color: theme.text }}>
-            ←
-          </Text>
+        <TouchableOpacity style={styles.backButton} onPress={onBack}>
+          <Text style={styles.backButtonText}>←</Text>
         </TouchableOpacity>
 
-        <View className="flex-1 justify-center py-8">
+        <View style={styles.content}>
           {/* Welcome Text */}
-          <Text
-            className="text-3xl font-poppins-bold mb-2"
-            style={{ color: theme.heading }}
-          >
-            Welcome Back!
-          </Text>
-          <Text
-            className="text-base font-inter mb-8"
-            style={{ color: theme.textSecondary }}
-          >
-            Sign in to continue
-          </Text>
+          <Text style={styles.title}>Welcome Back!</Text>
+          <Text style={styles.subtitle}>Sign in to continue</Text>
 
           {/* Email Input */}
-          <View className="mb-4">
-            <Text
-              className="text-sm font-poppins-medium mb-2"
-              style={{ color: theme.text }}
-            >
-              Email
-            </Text>
+          <View style={styles.inputContainer}>
+            <Text style={styles.inputLabel}>Email</Text>
             <TextInput
-              className="w-full px-4 py-4 rounded-xl font-inter"
-              style={{
-                backgroundColor: theme.backgroundCard,
-                color: theme.text,
-                borderWidth: 1,
-                borderColor: theme.border,
-              }}
+              style={styles.input}
               placeholder="Enter your email"
               placeholderTextColor={theme.textSecondary}
               value={email}
-              onChangeText={setEmail}
+              onChangeText={(text) => setEmail(text.trim())}
               keyboardType="email-address"
               autoCapitalize="none"
+              autoCorrect={false}
+              autoComplete="email"
+              textContentType="emailAddress"
               editable={!loading}
+              returnKeyType="next"
+              onSubmitEditing={() => passwordInputRef.current?.focus()}
+              blurOnSubmit={false}
+              clearButtonMode="while-editing"
             />
           </View>
 
           {/* Password Input */}
-          <View className="mb-6">
-            <Text
-              className="text-sm font-poppins-medium mb-2"
-              style={{ color: theme.text }}
-            >
-              Password
-            </Text>
-            <View className="relative">
+          <View style={styles.passwordInputContainer}>
+            <Text style={styles.inputLabel}>Password</Text>
+            <View style={styles.inputWrapper}>
               <TextInput
-                className="w-full px-4 py-4 rounded-xl font-inter"
-                style={{
-                  backgroundColor: theme.backgroundCard,
-                  color: theme.text,
-                  borderWidth: 1,
-                  borderColor: theme.border,
-                }}
+                ref={passwordInputRef}
+                style={styles.input}
                 placeholder="Enter your password"
                 placeholderTextColor={theme.textSecondary}
                 value={password}
                 onChangeText={setPassword}
                 secureTextEntry={!showPassword}
+                autoCapitalize="none"
+                autoCorrect={false}
+                autoComplete="password"
+                textContentType="password"
                 editable={!loading}
+                returnKeyType="done"
+                onSubmitEditing={handleEmailSignIn}
               />
               <TouchableOpacity
-                className="absolute right-4 top-4"
+                style={styles.passwordToggle}
                 onPress={() => setShowPassword(!showPassword)}
+                hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
               >
                 <Text style={{ color: theme.textSecondary }}>
                   {showPassword ? '👁️' : '👁️‍🗨️'}
@@ -167,32 +296,22 @@ export const SignInScreen: React.FC<SignInScreenProps> = ({
 
           {/* Sign In Button */}
           <TouchableOpacity
-            className="w-full py-4 rounded-full items-center justify-center mb-4"
-            style={{ backgroundColor: theme.primary }}
+            style={styles.signInButton}
             onPress={handleEmailSignIn}
             disabled={loading}
           >
             {loading ? (
               <ActivityIndicator color="#FFFFFF" />
             ) : (
-              <Text className="text-base font-poppins-semibold text-white">
-                Sign In
-              </Text>
+              <Text style={styles.signInButtonText}>Sign In</Text>
             )}
           </TouchableOpacity>
 
           {/* Sign Up Link */}
-          <View className="flex-row items-center justify-center mt-4">
-            <Text className="text-base font-inter" style={{ color: theme.textSecondary }}>
-              Don't have an account?{' '}
-            </Text>
+          <View style={styles.linkContainer}>
+            <Text style={styles.linkText}>Don't have an account? </Text>
             <TouchableOpacity onPress={onSwitchToSignUp}>
-              <Text
-                className="text-base font-poppins-semibold"
-                style={{ color: theme.primary }}
-              >
-                Sign Up
-              </Text>
+              <Text style={styles.linkButtonText}>Sign Up</Text>
             </TouchableOpacity>
           </View>
         </View>

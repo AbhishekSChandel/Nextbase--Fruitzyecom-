@@ -5,6 +5,7 @@ import {
   TouchableOpacity,
   ScrollView,
   ActivityIndicator,
+  StyleSheet,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -57,77 +58,172 @@ export const CheckoutScreen: React.FC<Props> = ({ navigation }) => {
     }
   };
 
+  const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: theme.background,
+    },
+    safeArea: {
+      flex: 1,
+    },
+    header: {
+      paddingHorizontal: 24,
+      paddingTop: 16,
+      marginBottom: 24,
+    },
+    backButton: {
+      width: 64,
+      height: 64,
+      borderRadius: 32,
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginBottom: 24,
+      backgroundColor: theme.backgroundCard,
+    },
+    title: {
+      fontFamily: 'Poppins_700Bold',
+      color: theme.heading,
+      fontSize: fontSizes.h2,
+    },
+    scrollView: {
+      flex: 1,
+      paddingHorizontal: 24,
+    },
+    orderSummary: {
+      borderRadius: 24,
+      padding: 24,
+      marginBottom: 24,
+      backgroundColor: theme.backgroundCard,
+    },
+    orderSummaryTitle: {
+      fontFamily: 'Poppins_700Bold',
+      marginBottom: 16,
+      color: theme.heading,
+      fontSize: fontSizes.h3,
+    },
+    orderItem: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      marginBottom: 12,
+    },
+    orderItemName: {
+      flex: 1,
+      fontFamily: 'Inter_400Regular',
+      color: theme.text,
+      fontSize: fontSizes.body,
+    },
+    orderItemPrice: {
+      fontFamily: 'Poppins_600SemiBold',
+      marginLeft: 16,
+      color: theme.primary,
+      fontSize: fontSizes.body,
+    },
+    totalDivider: {
+      marginTop: 16,
+      paddingTop: 16,
+      borderTopWidth: 1,
+      borderTopColor: theme.border,
+    },
+    totalRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+    },
+    totalLabel: {
+      fontFamily: 'Poppins_700Bold',
+      color: theme.heading,
+      fontSize: fontSizes.h4,
+    },
+    totalPrice: {
+      fontFamily: 'Poppins_700Bold',
+      color: theme.primary,
+      fontSize: fontSizes.priceSmall,
+    },
+    deliveryInfo: {
+      borderRadius: 24,
+      padding: 24,
+      marginBottom: 24,
+      backgroundColor: theme.backgroundCard,
+    },
+    deliveryTitle: {
+      fontFamily: 'Poppins_700Bold',
+      marginBottom: 12,
+      color: theme.heading,
+      fontSize: fontSizes.h3,
+    },
+    deliveryText: {
+      fontFamily: 'Inter_400Regular',
+      color: theme.textSecondary,
+      fontSize: fontSizes.body,
+    },
+    deliveryTextMargin: {
+      fontFamily: 'Inter_400Regular',
+      marginTop: 4,
+      color: theme.textSecondary,
+      fontSize: fontSizes.body,
+    },
+    bottomSpacer: {
+      height: 96,
+    },
+    bottomSection: {
+      paddingHorizontal: 24,
+      paddingBottom: 24,
+      paddingTop: 16,
+    },
+    placeOrderButton: {
+      paddingVertical: 20,
+      borderRadius: 25,
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: processing ? theme.textLight : theme.primary,
+    },
+    placeOrderText: {
+      color: '#FFFFFF',
+      fontFamily: 'Poppins_600SemiBold',
+      fontSize: fontSizes.button,
+    },
+  });
+
   return (
-    <View className="flex-1" style={{ backgroundColor: theme.background }}>
-      <SafeAreaView className="flex-1">
+    <View style={styles.container}>
+      <SafeAreaView style={styles.safeArea}>
         {/* Header */}
-        <View className="px-6 pt-4 mb-6">
+        <View style={styles.header}>
           <TouchableOpacity
-            className="w-16 h-16 rounded-full items-center justify-center mb-6"
-            style={{ backgroundColor: theme.backgroundCard }}
+            style={styles.backButton}
             onPress={() => navigation.goBack()}
             disabled={processing}
           >
             <BackIcon size={24} color={theme.text} />
           </TouchableOpacity>
 
-          <Text
-            className="font-poppins-bold"
-            style={{ color: theme.heading, fontSize: fontSizes.h2 }}
-          >
-            Checkout
-          </Text>
+          <Text style={styles.title}>Checkout</Text>
         </View>
 
-        <ScrollView className="flex-1 px-6" showsVerticalScrollIndicator={false}>
+        <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
           {/* Order Summary */}
-          <View
-            className="rounded-3xl p-6 mb-6"
-            style={{ backgroundColor: theme.backgroundCard }}
-          >
-            <Text
-              className="font-poppins-bold mb-4"
-              style={{ color: theme.heading, fontSize: fontSizes.h3 }}
-            >
-              Order Summary
-            </Text>
+          <View style={styles.orderSummary}>
+            <Text style={styles.orderSummaryTitle}>Order Summary</Text>
 
             {cartItems.map((item) => (
-              <View
-                key={item.product.id}
-                className="flex-row items-center justify-between mb-3"
-              >
+              <View key={item.product.id} style={styles.orderItem}>
                 <Text
-                  className="flex-1 font-inter"
-                  style={{ color: theme.text, fontSize: fontSizes.body }}
+                  style={styles.orderItemName}
                   numberOfLines={1}
                 >
                   {item.product.name} × {item.quantity}
                 </Text>
-                <Text
-                  className="font-poppins-semibold ml-4"
-                  style={{ color: theme.primary, fontSize: fontSizes.body }}
-                >
+                <Text style={styles.orderItemPrice}>
                   ${(item.product.price * item.quantity).toFixed(2)}
                 </Text>
               </View>
             ))}
 
-            <View
-              className="mt-4 pt-4"
-              style={{ borderTopWidth: 1, borderTopColor: theme.border }}
-            >
-              <View className="flex-row items-center justify-between">
-                <Text
-                  className="font-poppins-bold"
-                  style={{ color: theme.heading, fontSize: fontSizes.h4 }}
-                >
-                  Total
-                </Text>
-                <Text
-                  className="font-poppins-bold"
-                  style={{ color: theme.primary, fontSize: fontSizes.priceSmall }}
-                >
+            <View style={styles.totalDivider}>
+              <View style={styles.totalRow}>
+                <Text style={styles.totalLabel}>Total</Text>
+                <Text style={styles.totalPrice}>
                   ${cartTotal.toFixed(2)}
                 </Text>
               </View>
@@ -135,40 +231,23 @@ export const CheckoutScreen: React.FC<Props> = ({ navigation }) => {
           </View>
 
           {/* Delivery Info Placeholder */}
-          <View
-            className="rounded-3xl p-6 mb-6"
-            style={{ backgroundColor: theme.backgroundCard }}
-          >
-            <Text
-              className="font-poppins-bold mb-3"
-              style={{ color: theme.heading, fontSize: fontSizes.h3 }}
-            >
-              Delivery Information
-            </Text>
-            <Text
-              className="font-inter"
-              style={{ color: theme.textSecondary, fontSize: fontSizes.body }}
-            >
+          <View style={styles.deliveryInfo}>
+            <Text style={styles.deliveryTitle}>Delivery Information</Text>
+            <Text style={styles.deliveryText}>
               📍 Standard delivery (2-3 days)
             </Text>
-            <Text
-              className="font-inter mt-1"
-              style={{ color: theme.textSecondary, fontSize: fontSizes.body }}
-            >
+            <Text style={styles.deliveryTextMargin}>
               🚚 Free shipping on all orders
             </Text>
           </View>
 
-          <View className="h-24" />
+          <View style={styles.bottomSpacer} />
         </ScrollView>
 
         {/* Place Order Button */}
-        <View className="px-6 pb-6 pt-4">
+        <View style={styles.bottomSection}>
           <TouchableOpacity
-            className="py-5 rounded-full items-center justify-center"
-            style={{
-              backgroundColor: processing ? theme.textLight : theme.primary,
-            }}
+            style={styles.placeOrderButton}
             onPress={handlePlaceOrder}
             disabled={processing}
             activeOpacity={0.8}
@@ -176,12 +255,7 @@ export const CheckoutScreen: React.FC<Props> = ({ navigation }) => {
             {processing ? (
               <ActivityIndicator color="white" />
             ) : (
-              <Text
-                className="text-white font-poppins-semibold"
-                style={{ fontSize: fontSizes.button }}
-              >
-                Place Order
-              </Text>
+              <Text style={styles.placeOrderText}>Place Order</Text>
             )}
           </TouchableOpacity>
         </View>

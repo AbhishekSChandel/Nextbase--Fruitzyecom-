@@ -6,6 +6,7 @@ import {
   ScrollView,
   ActivityIndicator,
   ViewStyle,
+  StyleSheet,
   Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -53,35 +54,51 @@ export const LandingSignUpScreen: React.FC<LandingSignUpScreenProps> = ({
     disabled?: boolean;
     isLoading?: boolean;
     style?: ViewStyle;
-  }) => (
-    <TouchableOpacity
-      className="w-full rounded-full mb-3 flex-row items-center justify-center"
-      style={{
+  }) => {
+    const buttonStyles = StyleSheet.create({
+      button: {
+        width: '100%',
+        borderRadius: 25,
+        marginBottom: 12,
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
         backgroundColor,
         borderWidth: borderColor ? 1 : 0,
         borderColor: borderColor ?? 'transparent',
         paddingVertical: 16,
         ...(style || {}),
-      }}
-      onPress={onPress}
-      disabled={disabled}
-      activeOpacity={0.8}
-    >
-      <View style={{ width: 24, alignItems: 'center', marginRight: 12 }}>
-        {isLoading ? (
-          <ActivityIndicator size="small" color={textColor} />
-        ) : (
-          icon
-        )}
-      </View>
-      <Text
-        className="font-poppins-medium"
-        style={{ color: textColor, fontSize: 16 }}
+      },
+      iconContainer: {
+        width: 24,
+        alignItems: 'center',
+        marginRight: 12,
+      },
+      buttonText: {
+        fontFamily: 'Poppins_500Medium',
+        color: textColor,
+        fontSize: 16,
+      },
+    });
+
+    return (
+      <TouchableOpacity
+        style={[buttonStyles.button, style]}
+        onPress={onPress}
+        disabled={disabled}
+        activeOpacity={0.8}
       >
-        {label}
-      </Text>
-    </TouchableOpacity>
-  );
+        <View style={buttonStyles.iconContainer}>
+          {isLoading ? (
+            <ActivityIndicator size="small" color={textColor} />
+          ) : (
+            icon
+          )}
+        </View>
+        <Text style={buttonStyles.buttonText}>{label}</Text>
+      </TouchableOpacity>
+    );
+  };
 
   const handleGoogleSignUp = async () => {
     try {
@@ -117,20 +134,57 @@ export const LandingSignUpScreen: React.FC<LandingSignUpScreenProps> = ({
     }
   };
 
+  const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: theme.background,
+    },
+    scrollContent: {
+      flexGrow: 1,
+      justifyContent: 'center',
+      paddingHorizontal: 24,
+    },
+    content: {
+      alignItems: 'center',
+      paddingVertical: 48,
+    },
+    title: {
+      fontSize: 30,
+      fontFamily: 'Poppins_700Bold',
+      textAlign: 'center',
+      marginBottom: 48,
+      color: theme.heading,
+    },
+    separator: {
+      textAlign: 'center',
+      fontFamily: 'Inter_400Regular',
+      marginVertical: 8,
+      fontSize: 14,
+      color: theme.textSecondary,
+    },
+    linkContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    linkText: {
+      fontSize: 16,
+      fontFamily: 'Inter_400Regular',
+      color: theme.textSecondary,
+    },
+    linkButtonText: {
+      fontSize: 16,
+      fontFamily: 'Poppins_600SemiBold',
+      color: '#2ECC71',
+    },
+  });
+
   return (
-    <SafeAreaView className="flex-1" style={{ backgroundColor: theme.background }}>
-      <ScrollView
-        contentContainerStyle={{ flexGrow: 1, justifyContent: 'center' }}
-        className="px-6"
-      >
-        <View className="items-center py-12">
+    <SafeAreaView style={styles.container}>
+      <ScrollView contentContainerStyle={styles.scrollContent}>
+        <View style={styles.content}>
           {/* Welcome Text */}
-          <Text
-            className="text-3xl font-poppins-bold text-center mb-12"
-            style={{ color: theme.heading }}
-          >
-            Let's Get Started!
-          </Text>
+          <Text style={styles.title}>Let's Get Started!</Text>
 
           {/* Email Button */}
           <SocialButton
@@ -151,12 +205,7 @@ export const LandingSignUpScreen: React.FC<LandingSignUpScreenProps> = ({
           />
 
           {/* Or Separator */}
-          <Text
-            className="text-center font-inter my-2"
-            style={{ color: theme.textSecondary, fontSize: 14 }}
-          >
-            or
-          </Text>
+          <Text style={styles.separator}>or</Text>
 
           {/* Apple Button */}
           <SocialButton
@@ -169,17 +218,10 @@ export const LandingSignUpScreen: React.FC<LandingSignUpScreenProps> = ({
           />
 
           {/* Sign In Link */}
-          <View className="flex-row items-center justify-center">
-            <Text className="text-base font-inter" style={{ color: theme.textSecondary }}>
-              Already Have an Account?{' '}
-            </Text>
+          <View style={styles.linkContainer}>
+            <Text style={styles.linkText}>Already Have an Account? </Text>
             <TouchableOpacity onPress={onSwitchToSignIn}>
-              <Text
-                className="text-base font-poppins-semibold"
-                style={{ color: '#2ECC71' }}
-              >
-                Sign in
-              </Text>
+              <Text style={styles.linkButtonText}>Sign in</Text>
             </TouchableOpacity>
           </View>
         </View>

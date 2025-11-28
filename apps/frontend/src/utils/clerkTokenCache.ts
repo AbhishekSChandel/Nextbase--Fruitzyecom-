@@ -1,5 +1,12 @@
 import * as SecureStore from 'expo-secure-store';
-import { TokenCache } from '@clerk/clerk-expo/dist/cache';
+
+/**
+ * Token cache interface matching Clerk's TokenCache type
+ */
+interface TokenCache {
+  getToken(key: string): Promise<string | null>;
+  saveToken(key: string, value: string): Promise<void>;
+}
 
 /**
  * Token cache implementation using expo-secure-store.

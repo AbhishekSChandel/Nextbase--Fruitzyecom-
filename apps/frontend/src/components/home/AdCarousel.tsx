@@ -5,6 +5,7 @@ import {
   Dimensions,
   NativeSyntheticEvent,
   NativeScrollEvent,
+  StyleSheet,
 } from 'react-native';
 import { Image as ExpoImage } from 'expo-image';
 import { useTheme } from '../../theme/ThemeContext';
@@ -52,35 +53,57 @@ export const AdCarousel: React.FC = () => {
 
   const renderBanner = ({ item, index }: { item: any; index: number }) => (
     <View
-      style={{
-        width: BANNER_WIDTH,
-        height: BANNER_HEIGHT,
-        marginRight: BANNER_SPACING,
-        borderRadius: 20,
-        overflow: 'hidden',
-        backgroundColor: theme.backgroundMint,
-        // Subtle shadow
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.08,
-        shadowRadius: 6,
-        elevation: 2,
-      }}
+      style={[
+        styles.bannerContainer,
+        {
+          width: BANNER_WIDTH,
+          height: BANNER_HEIGHT,
+          marginRight: BANNER_SPACING,
+          backgroundColor: theme.backgroundMint,
+        },
+      ]}
     >
       <ExpoImage
         source={item}
-        style={{
-          width: '100%',
-          height: '100%',
-        }}
+        style={styles.bannerImage}
         contentFit="cover"
         transition={300}
       />
     </View>
   );
 
+  const styles = StyleSheet.create({
+    container: {
+      marginTop: 16,
+      marginBottom: 12,
+    },
+    bannerContainer: {
+      borderRadius: 20,
+      overflow: 'hidden',
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.08,
+      shadowRadius: 6,
+      elevation: 2,
+    },
+    bannerImage: {
+      width: '100%',
+      height: '100%',
+    },
+    pagination: {
+      flexDirection: 'row',
+      justifyContent: 'center',
+      marginTop: 12,
+    },
+    dot: {
+      height: 6,
+      borderRadius: 3,
+      marginHorizontal: 3,
+    },
+  });
+
   return (
-    <View className="mt-4 mb-3">
+    <View style={styles.container}>
       <FlatList
         ref={flatListRef}
         data={banners}
@@ -94,7 +117,7 @@ export const AdCarousel: React.FC = () => {
         decelerationRate="fast"
         contentContainerStyle={{
           paddingHorizontal: SIDE_PADDING,
-          paddingRight: SIDE_PADDING, // Uniform padding on the right
+          paddingRight: SIDE_PADDING,
         }}
         onScroll={handleScroll}
         scrollEventThrottle={16}
@@ -109,17 +132,17 @@ export const AdCarousel: React.FC = () => {
       />
 
       {/* Pagination Dots */}
-      <View className="flex-row justify-center mt-3">
+      <View style={styles.pagination}>
         {banners.map((_, index) => (
           <View
             key={`dot-${index}`}
-            style={{
-              width: index === activeIndex ? 20 : 6,
-              height: 6,
-              borderRadius: 3,
-              marginHorizontal: 3,
-              backgroundColor: index === activeIndex ? theme.primary : theme.border,
-            }}
+            style={[
+              styles.dot,
+              {
+                width: index === activeIndex ? 20 : 6,
+                backgroundColor: index === activeIndex ? theme.primary : theme.border,
+              },
+            ]}
           />
         ))}
       </View>

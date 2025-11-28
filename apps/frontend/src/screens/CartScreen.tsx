@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, ScrollView } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Image } from 'expo-image';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -50,48 +50,236 @@ export const CartScreen: React.FC<Props> = ({ navigation }) => {
     navigation.navigate('Checkout');
   };
 
+  const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: theme.background,
+    },
+    safeArea: {
+      flex: 1,
+    },
+    header: {
+      paddingHorizontal: 24,
+      marginTop: 8,
+      marginBottom: 24,
+    },
+    headerWithItems: {
+      paddingHorizontal: 24,
+      paddingTop: 16,
+      marginBottom: 16,
+    },
+    backButton: {
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginBottom: 24,
+      width: 64,
+      height: 64,
+      borderRadius: 32,
+      backgroundColor: theme.backgroundCard,
+    },
+    title: {
+      
+      fontSize: 36,
+      fontFamily: 'Poppins_700Bold',
+      color: theme.heading,
+    },
+    headerRow: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+    },
+    titleWithItems: {
+      fontFamily: 'Poppins_700Bold',
+      color: theme.heading,
+      fontSize: fontSizes.h2,
+    },
+    itemCount: {
+      fontFamily: 'Poppins_500Medium',
+      color: theme.textSecondary,
+      fontSize: fontSizes.body,
+    },
+    emptyContainer: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      paddingHorizontal:32,
+    },
+    emptyEmoji: {
+      marginBottom:32,
+      fontSize: 80,
+    },
+    emptyTitle: {
+      marginBottom: 12,
+      fontSize: 24,
+      textAlign: 'center',
+      fontFamily: 'Poppins_700Bold',
+      color: theme.heading,
+    },
+    emptyText: {
+      marginBottom: 32,
+      fontSize: 16,
+      textAlign: 'center',
+      fontFamily: 'Inter_400Regular',
+      color: theme.textSecondary,
+    },
+    startShoppingButton: {
+      paddingHorizontal: 32,
+      paddingVertical: 16,
+      borderRadius: 25,
+      backgroundColor: theme.primary,
+    },
+    startShoppingText: {
+      fontSize: 16,
+      color: '#FFFFFF',
+      fontFamily: 'Poppins_600SemiBold',
+    },
+    scrollView: {
+      flex: 1,
+      paddingHorizontal: 24,
+    },
+    cartItem: {
+      flexDirection: 'row',
+      padding: 16,
+      marginBottom: 16,
+      borderRadius: 24,
+      backgroundColor: theme.backgroundCard,
+    },
+    itemImageContainer: {
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginRight: 16,
+      width: 96,
+      height: 96,
+      borderRadius: 16,
+      backgroundColor: theme.backgroundMint,
+    },
+    itemImage: {
+      width: 80,
+      height: 80,
+    },
+    itemInfo: {
+      flex: 1,
+    },
+    itemHeader: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'flex-start',
+      marginBottom: 8,
+    },
+    itemName: {
+      flex: 1,
+      fontFamily: 'Poppins_600SemiBold',
+      color: theme.heading,
+      fontSize: fontSizes.h4,
+    },
+    deleteButton: {
+      marginLeft: 8,
+    },
+    deleteText: {
+      fontSize: 16,
+    },
+    itemQuantity: {
+      marginBottom: 8,
+      fontFamily: 'Inter_400Regular',
+      color: theme.textSecondary,
+      fontSize: fontSizes.caption,
+    },
+    itemBottomRow: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+    },
+    itemPrice: {
+      fontFamily: 'Poppins_700Bold',
+      color: theme.primary,
+      fontSize: fontSizes.priceSmall,
+    },
+    quantityControls: {
+      flexDirection: 'row',
+      alignItems: 'center',
+    },
+    quantityButton: {
+      justifyContent: 'center',
+      alignItems: 'center',
+      width: 40,
+      height: 40,
+      borderRadius: 12,
+      backgroundColor: theme.background,
+    },
+    quantityText: {
+      marginHorizontal: 16,
+      fontFamily: 'Poppins_600SemiBold',
+      color: theme.heading,
+      fontSize: fontSizes.h4,
+    },
+    spacer: {
+      height: 16,
+    },
+    bottomSection: {
+      paddingHorizontal: 24,
+      paddingTop: 16,
+      paddingBottom: 24,
+      backgroundColor: theme.background,
+    },
+    totalRow: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      marginBottom: 24,
+    },
+    totalLabel: {
+      fontFamily: 'Poppins_600SemiBold',
+      color: theme.heading,
+      fontSize: fontSizes.h3,
+    },
+    totalPrice: {
+      fontFamily: 'Poppins_700Bold',
+      color: theme.primary,
+      fontSize: fontSizes.price,
+    },
+    checkoutButton: {
+      marginBottom: 25,
+      justifyContent: 'center',
+      alignItems: 'center',
+      paddingVertical: 20,
+      borderRadius: 25,
+      backgroundColor: theme.primary,
+    },
+    checkoutButtonText: {
+      color: '#FFFFFF',
+      fontFamily: 'Poppins_600SemiBold',
+      fontSize: fontSizes.button,
+    },
+  });
+
   if (cartItems.length === 0) {
     return (
-      <View className="flex-1" style={{ backgroundColor: theme.background }}>
-        <SafeAreaView className="flex-1">
+      <View style={styles.container}>
+        <SafeAreaView style={styles.safeArea}>
           {/* Header */}
-          <View className="px-6 mt-2 mb-6">
+          <View style={styles.header}>
             <TouchableOpacity
-              className="justify-center items-center mb-6 w-16 h-16 rounded-full"
-              style={{ backgroundColor: theme.backgroundCard }}
+              style={styles.backButton}
               onPress={() => navigation.goBack()}
             >
               <BackIcon size={24} color={theme.text} />
             </TouchableOpacity>
 
-            <Text className="text-4xl font-poppins-bold" style={{ color: theme.heading }}>
-              My Bag
-            </Text>
+            <Text style={styles.title}>My Bag</Text>
           </View>
 
           {/* Empty State */}
-          <View className="flex-1 justify-center items-center px-8">
-            <Text className="mb-6 text-8xl">🛍️</Text>
-            <Text
-              className="mb-3 text-2xl text-center font-poppins-bold"
-              style={{ color: theme.heading }}
-            >
-              Your cart is empty
-            </Text>
-            <Text
-              className="mb-8 text-base text-center font-inter"
-              style={{ color: theme.textSecondary }}
-            >
+          <View style={styles.emptyContainer}>
+            <Text style={styles.emptyEmoji}>🛍️</Text>
+            <Text style={styles.emptyTitle}>Your cart is empty</Text>
+            <Text style={styles.emptyText}>
               Add some delicious items to get started!
             </Text>
             <TouchableOpacity
-              className="px-8 py-4 rounded-full"
-              style={{ backgroundColor: theme.primary }}
+              style={styles.startShoppingButton}
               onPress={() => navigation.navigate('Home')}
             >
-              <Text className="text-base text-white font-poppins-semibold">
-                Start Shopping
-              </Text>
+              <Text style={styles.startShoppingText}>Start Shopping</Text>
             </TouchableOpacity>
           </View>
         </SafeAreaView>
@@ -100,50 +288,34 @@ export const CartScreen: React.FC<Props> = ({ navigation }) => {
   }
 
   return (
-    <View className="flex-1" style={{ backgroundColor: theme.background }}>
-      <SafeAreaView className="flex-1">
+    <View style={styles.container}>
+      <SafeAreaView style={styles.safeArea}>
         {/* Header */}
-        <View className="px-6 pt-4 mb-4">
+        <View style={styles.headerWithItems}>
           <TouchableOpacity
-            className="justify-center items-center mb-6 w-16 h-16 rounded-full"
-            style={{ backgroundColor: theme.backgroundCard }}
+            style={styles.backButton}
             onPress={() => navigation.goBack()}
           >
             <BackIcon size={24} color={theme.text} />
           </TouchableOpacity>
 
-          <View className="flex-row justify-between items-center">
-            <Text
-              className="font-poppins-bold"
-              style={{ color: theme.heading, fontSize: fontSizes.h2 }}
-            >
-              My Bag
-            </Text>
-            <Text
-              className="font-poppins-medium"
-              style={{ color: theme.textSecondary, fontSize: fontSizes.body }}
-            >
+          <View style={styles.headerRow}>
+            <Text style={styles.titleWithItems}>My Bag</Text>
+            <Text style={styles.itemCount}>
               {cartCount} item{cartCount !== 1 ? 's' : ''}
             </Text>
           </View>
         </View>
 
         {/* Cart Items */}
-        <ScrollView className="flex-1 px-6" showsVerticalScrollIndicator={false}>
+        <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
           {cartItems.map((item) => (
-            <View
-              key={item.product.id}
-              className="flex-row p-4 mb-4 rounded-3xl"
-              style={{ backgroundColor: theme.backgroundCard }}
-            >
+            <View key={item.product.id} style={styles.cartItem}>
               {/* Product Image */}
-              <View
-                className="justify-center items-center mr-4 w-24 h-24 rounded-2xl"
-                style={{ backgroundColor: theme.backgroundMint }}
-              >
+              <View style={styles.itemImageContainer}>
                 <Image
                   source={getProductImageSource(item.product)}
-                  style={{ width: 80, height: 80 }}
+                  style={styles.itemImage}
                   contentFit="contain"
                   transition={200}
                   cachePolicy="memory-disk"
@@ -151,61 +323,49 @@ export const CartScreen: React.FC<Props> = ({ navigation }) => {
               </View>
 
               {/* Product Info */}
-              <View className="flex-1">
+              <View style={styles.itemInfo}>
                 {/* Name and Delete */}
-                <View className="flex-row justify-between items-start mb-2">
+                <View style={styles.itemHeader}>
                   <Text
-                    className="flex-1 font-poppins-semibold"
-                    style={{ color: theme.heading, fontSize: fontSizes.h4 }}
+                    style={styles.itemName}
                     numberOfLines={1}
                   >
                     {item.product.name}
                   </Text>
-                  <TouchableOpacity className="ml-2" onPress={() => handleRemove(item)}>
-                    <Text className="text-base">❌</Text>
+                  <TouchableOpacity style={styles.deleteButton} onPress={() => handleRemove(item)}>
+                    <Text style={styles.deleteText}>❌</Text>
                   </TouchableOpacity>
                 </View>
 
                 {/* Quantity and Price */}
-                <Text
-                  className="mb-2 font-inter"
-                  style={{ color: theme.textSecondary, fontSize: fontSizes.caption }}
-                >
+                <Text style={styles.itemQuantity}>
                   {item.quantity} kg
                 </Text>
 
-                <View className="flex-row justify-between items-center">
+                <View style={styles.itemBottomRow}>
                   {/* Price */}
-                  <Text
-                    className="font-poppins-bold"
-                    style={{ color: theme.primary, fontSize: fontSizes.priceSmall }}
-                  >
+                  <Text style={styles.itemPrice}>
                     $ {(item.product.price * item.quantity).toFixed(1)}
                   </Text>
 
                   {/* Quantity Controls */}
-                  <View className="flex-row items-center">
+                  <View style={styles.quantityControls}>
                     {/* Minus */}
                     <TouchableOpacity
-                      className="justify-center items-center w-10 h-10 rounded-xl"
-                      style={{ backgroundColor: theme.background }}
+                      style={styles.quantityButton}
                       onPress={() => handleDecrement(item)}
                     >
                       <MinusIcon size={20} color={theme.text} />
                     </TouchableOpacity>
 
                     {/* Quantity */}
-                    <Text
-                      className="mx-4 font-poppins-semibold"
-                      style={{ color: theme.heading, fontSize: fontSizes.h4 }}
-                    >
+                    <Text style={styles.quantityText}>
                       {item.quantity}
                     </Text>
 
                     {/* Plus */}
                     <TouchableOpacity
-                      className="justify-center items-center w-10 h-10 rounded-xl"
-                      style={{ backgroundColor: theme.background }}
+                      style={styles.quantityButton}
                       onPress={() => handleIncrement(item)}
                     >
                       <AddIcon size={20} color={theme.primary} />
@@ -216,38 +376,26 @@ export const CartScreen: React.FC<Props> = ({ navigation }) => {
             </View>
           ))}
 
-          <View className="h-4" />
+          <View style={styles.spacer} />
         </ScrollView>
 
         {/* Bottom Section: Total and Checkout */}
-        <View className="px-6 pt-4 pb-6" style={{ backgroundColor: theme.background }}>
+        <View style={styles.bottomSection}>
           {/* Total */}
-          <View className="flex-row justify-between items-center mb-6">
-            <Text
-              className="font-poppins-semibold"
-              style={{ color: theme.heading, fontSize: fontSizes.h3 }}
-            >
-              Total
-            </Text>
-            <Text
-              className="font-poppins-bold"
-              style={{ color: theme.primary, fontSize: fontSizes.price }}
-            >
+          <View style={styles.totalRow}>
+            <Text style={styles.totalLabel}>Total</Text>
+            <Text style={styles.totalPrice}>
               $ {cartTotal.toFixed(1)}
             </Text>
           </View>
 
           {/* Checkout Button */}
           <TouchableOpacity
-            className="justify-center items-center py-5 rounded-full"
-            style={{ backgroundColor: theme.primary }}
+            style={styles.checkoutButton}
             onPress={handleCheckout}
             activeOpacity={0.8}
           >
-            <Text
-              className="text-white font-poppins-semibold"
-              style={{ fontSize: fontSizes.button }}
-            >
+            <Text style={styles.checkoutButtonText}>
               Proceed To Checkout
             </Text>
           </TouchableOpacity>

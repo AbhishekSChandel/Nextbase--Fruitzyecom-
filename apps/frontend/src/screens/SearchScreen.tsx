@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   ScrollView,
   ActivityIndicator,
+  StyleSheet,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -90,53 +91,194 @@ export const SearchScreen: React.FC<Props> = ({ navigation }) => {
     showToast(`${product.name} added to your cart`, { type: 'success' });
   };
 
+  const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: theme.background,
+    },
+    safeArea: {
+      flex: 1,
+    },
+    header: {
+      paddingHorizontal: 24,
+      paddingTop: 16,
+      paddingBottom: 16,
+    },
+    headerRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      marginBottom: 16,
+    },
+    backButton: {
+      width: 64,
+      height: 64,
+      borderRadius: 32,
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: theme.backgroundCard,
+    },
+    titleContainer: {
+      flex: 1,
+      marginHorizontal: 16,
+    },
+    title: {
+      fontFamily: 'Poppins_600SemiBold',
+      textAlign: 'center',
+      color: theme.heading,
+      fontSize: fontSizes.h4,
+    },
+    cartButton: {
+      width: 64,
+      height: 64,
+      borderRadius: 16,
+      alignItems: 'center',
+      justifyContent: 'center',
+      position: 'relative',
+      backgroundColor: theme.backgroundCard,
+    },
+    badge: {
+      position: 'absolute',
+      borderRadius: 10,
+      alignItems: 'center',
+      justifyContent: 'center',
+      top: 8,
+      right: 8,
+      width: 20,
+      height: 20,
+      backgroundColor: theme.accentRed,
+    },
+    badgeText: {
+      color: '#FFFFFF',
+      fontFamily: 'Poppins_700Bold',
+      fontSize: fontSizes.caption,
+    },
+    searchContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      paddingHorizontal: 16,
+      paddingVertical: 16,
+      borderRadius: 24,
+      backgroundColor: theme.backgroundCard,
+    },
+    searchInput: {
+      flex: 1,
+      fontFamily: 'Inter_400Regular',
+      fontSize: 16,
+      color: theme.text,
+    },
+    recentSearchesContainer: {
+      paddingHorizontal: 24,
+      marginBottom: 24,
+    },
+    recentSearchesHeader: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      marginBottom: 16,
+    },
+    recentSearchesTitle: {
+      fontFamily: 'Poppins_700Bold',
+      color: theme.heading,
+      fontSize: fontSizes.h3,
+    },
+    removeButton: {
+      fontFamily: 'Poppins_500Medium',
+      color: theme.accentRed,
+      fontSize: fontSizes.body,
+    },
+    recentSearchesTags: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+    },
+    recentSearchTag: {
+      paddingHorizontal: 24,
+      paddingVertical: 12,
+      borderRadius: 25,
+      marginRight: 8,
+      marginBottom: 8,
+      backgroundColor: theme.backgroundCard,
+    },
+    recentSearchTagText: {
+      fontFamily: 'Poppins_500Medium',
+      color: theme.text,
+      fontSize: fontSizes.body,
+    },
+    resultsScrollView: {
+      flex: 1,
+      paddingHorizontal: 24,
+    },
+    loadingContainer: {
+      paddingVertical: 32,
+    },
+    resultsHeader: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      marginBottom: 16,
+    },
+    resultsTitle: {
+      fontFamily: 'Poppins_700Bold',
+      color: theme.primary,
+      fontSize: fontSizes.h2,
+    },
+    filterButton: {
+      width: 40,
+      height: 40,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    noResultsContainer: {
+      paddingVertical: 32,
+      alignItems: 'center',
+    },
+    noResultsEmoji: {
+      fontSize: 48,
+      marginBottom: 16,
+    },
+    noResultsTitle: {
+      fontFamily: 'Poppins_600SemiBold',
+      textAlign: 'center',
+      color: theme.heading,
+      fontSize: fontSizes.h3,
+    },
+    noResultsText: {
+      fontFamily: 'Inter_400Regular',
+      textAlign: 'center',
+      marginTop: 8,
+      color: theme.textSecondary,
+      fontSize: fontSizes.body,
+    },
+  });
+
   return (
-    <View className="flex-1" style={{ backgroundColor: theme.background }}>
-      <SafeAreaView className="flex-1">
+    <View style={styles.container}>
+      <SafeAreaView style={styles.safeArea}>
         {/* Header with Back, Title, and Cart */}
-        <View className="px-6 pt-4 pb-4">
-          <View className="flex-row items-center justify-between mb-4">
+        <View style={styles.header}>
+          <View style={styles.headerRow}>
             {/* Back Button */}
             <TouchableOpacity
-              className="w-16 h-16 rounded-full items-center justify-center"
-              style={{ backgroundColor: theme.backgroundCard }}
+              style={styles.backButton}
               onPress={() => navigation.goBack()}
             >
               <BackIcon size={24} color={theme.text} />
             </TouchableOpacity>
 
             {/* Title - "Search Groceries" */}
-            <View className="flex-1 mx-4">
-              <Text
-                className="font-poppins-semibold text-center"
-                style={{ color: theme.heading, fontSize: fontSizes.h4 }}
-              >
-                Search Groceries
-              </Text>
+            <View style={styles.titleContainer}>
+              <Text style={styles.title}>Search Groceries</Text>
             </View>
 
             {/* Cart Icon with Badge */}
             <TouchableOpacity
-              className="w-16 h-16 rounded-2xl items-center justify-center relative"
-              style={{ backgroundColor: theme.backgroundCard }}
+              style={styles.cartButton}
               onPress={() => navigation.navigate('Cart')}
             >
               <CartIcon size={24} color={theme.textSecondary} />
               {cartCount > 0 && (
-                <View
-                  className="absolute rounded-full items-center justify-center"
-                  style={{
-                    top: 8,
-                    right: 8,
-                    width: 20,
-                    height: 20,
-                    backgroundColor: theme.accentRed,
-                  }}
-                >
-                  <Text
-                    className="text-white font-poppins-bold"
-                    style={{ fontSize: fontSizes.caption }}
-                  >
+                <View style={styles.badge}>
+                  <Text style={styles.badgeText}>
                     {cartCount > 9 ? '9+' : cartCount}
                   </Text>
                 </View>
@@ -145,16 +287,12 @@ export const SearchScreen: React.FC<Props> = ({ navigation }) => {
           </View>
 
           {/* Search Input */}
-          <View
-            className="flex-row items-center px-4 py-4 rounded-3xl"
-            style={{ backgroundColor: theme.backgroundCard }}
-          >
+          <View style={styles.searchContainer}>
             <View style={{ marginRight: 12 }}>
               <SearchIcon size={24} color={theme.primary} />
             </View>
             <TextInput
-              className="flex-1 font-inter text-base"
-              style={{ color: theme.text }}
+              style={styles.searchInput}
               placeholder="Sweet Fruit"
               placeholderTextColor={theme.textLight}
               value={searchQuery}
@@ -168,40 +306,24 @@ export const SearchScreen: React.FC<Props> = ({ navigation }) => {
 
         {/* Recent Searches or Results */}
         {!searchQuery.trim() && recentSearches.length > 0 && (
-          <View className="px-6 mb-6">
+          <View style={styles.recentSearchesContainer}>
             {/* Title Row */}
-            <View className="flex-row items-center justify-between mb-4">
-              <Text
-                className="font-poppins-bold"
-                style={{ color: theme.heading, fontSize: fontSizes.h3 }}
-              >
-                Title
-              </Text>
+            <View style={styles.recentSearchesHeader}>
+              <Text style={styles.recentSearchesTitle}>Title</Text>
               <TouchableOpacity onPress={handleRemoveRecentSearches}>
-                <Text
-                  className="font-poppins-medium"
-                  style={{ color: theme.accentRed, fontSize: fontSizes.body }}
-                >
-                  remove
-                </Text>
+                <Text style={styles.removeButton}>remove</Text>
               </TouchableOpacity>
             </View>
 
             {/* Recent Search Tags */}
-            <View className="flex-row flex-wrap">
+            <View style={styles.recentSearchesTags}>
               {recentSearches.map((search, index) => (
                 <TouchableOpacity
                   key={index}
-                  className="px-6 py-3 rounded-full mr-2 mb-2"
-                  style={{ backgroundColor: theme.backgroundCard }}
+                  style={styles.recentSearchTag}
                   onPress={() => handleRecentSearchPress(search)}
                 >
-                  <Text
-                    className="font-poppins-medium"
-                    style={{ color: theme.text, fontSize: fontSizes.body }}
-                  >
-                    {search}
-                  </Text>
+                  <Text style={styles.recentSearchTagText}>{search}</Text>
                 </TouchableOpacity>
               ))}
             </View>
@@ -210,24 +332,21 @@ export const SearchScreen: React.FC<Props> = ({ navigation }) => {
 
         {/* Search Results */}
         {searchQuery.trim() && (
-          <ScrollView className="flex-1 px-6" showsVerticalScrollIndicator={false}>
+          <ScrollView style={styles.resultsScrollView} showsVerticalScrollIndicator={false}>
             {loading ? (
-              <View className="py-8">
+              <View style={styles.loadingContainer}>
                 <ActivityIndicator size="large" color={theme.primary} />
               </View>
             ) : filteredProducts.length > 0 ? (
               <>
                 {/* Results Header with Filter Icon */}
-                <View className="flex-row items-center justify-between mb-4">
-                  <Text
-                    className="font-poppins-bold"
-                    style={{ color: theme.primary, fontSize: fontSizes.h2 }}
-                  >
+                <View style={styles.resultsHeader}>
+                  <Text style={styles.resultsTitle}>
                     Found {filteredProducts.length} Result
                     {filteredProducts.length !== 1 ? 's' : ''}
                   </Text>
                   <TouchableOpacity
-                    className="w-10 h-10 items-center justify-center"
+                    style={styles.filterButton}
                     onPress={() => showToast('Filter options coming soon', { type: 'neutral' })}
                   >
                     <Icon
@@ -248,20 +367,10 @@ export const SearchScreen: React.FC<Props> = ({ navigation }) => {
                 ))}
               </>
             ) : (
-              <View className="py-8 items-center">
-                <Text className="text-6xl mb-4">🔍</Text>
-                <Text
-                  className="font-poppins-semibold text-center"
-                  style={{ color: theme.heading, fontSize: fontSizes.h3 }}
-                >
-                  No products found
-                </Text>
-                <Text
-                  className="font-inter text-center mt-2"
-                  style={{ color: theme.textSecondary, fontSize: fontSizes.body }}
-                >
-                  Try searching for something else
-                </Text>
+              <View style={styles.noResultsContainer}>
+                <Text style={styles.noResultsEmoji}>🔍</Text>
+                <Text style={styles.noResultsTitle}>No products found</Text>
+                <Text style={styles.noResultsText}>Try searching for something else</Text>
               </View>
             )}
           </ScrollView>

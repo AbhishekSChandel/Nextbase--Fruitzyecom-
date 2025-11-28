@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useTheme } from '../theme/ThemeContext';
@@ -16,55 +16,105 @@ export const OrderConfirmedScreen: React.FC<Props> = ({ route, navigation }) => 
     navigation.navigate('Home');
   };
 
+  const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: theme.background,
+    },
+    safeArea: {
+      flex: 1,
+    },
+    content: {
+      flex: 1,
+      alignItems: 'center',
+      justifyContent: 'center',
+      paddingHorizontal: 32,
+    },
+    iconOuter: {
+      width: 128,
+      height: 128,
+      borderRadius: 64,
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginBottom: 32,
+      backgroundColor: theme.backgroundMint,
+    },
+    iconInner: {
+      width: 96,
+      height: 96,
+      borderRadius: 48,
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: theme.primary,
+    },
+    iconText: {
+      fontSize: 36,
+      color: '#FFFFFF',
+    },
+    title: {
+      fontSize: 36,
+      fontFamily: 'Poppins_700Bold',
+      marginBottom: 16,
+      color: theme.heading,
+    },
+    message: {
+      fontSize: 16,
+      fontFamily: 'Inter_400Regular',
+      textAlign: 'center',
+      marginBottom: 8,
+      color: theme.textSecondary,
+    },
+    orderId: {
+      fontSize: 14,
+      fontFamily: 'Inter_400Regular',
+      textAlign: 'center',
+      marginBottom: 48,
+      color: theme.textLight,
+    },
+    button: {
+      width: '100%',
+      paddingVertical: 20,
+      borderRadius: 25,
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: theme.primary,
+    },
+    buttonText: {
+      color: '#FFFFFF',
+      fontSize: 18,
+      fontFamily: 'Poppins_600SemiBold',
+    },
+  });
+
   return (
-    <View className="flex-1" style={{ backgroundColor: theme.background }}>
-      <SafeAreaView className="flex-1">
-        <View className="flex-1 items-center justify-center px-8">
+    <View style={styles.container}>
+      <SafeAreaView style={styles.safeArea}>
+        <View style={styles.content}>
           {/* Success Icon */}
-          <View
-            className="w-32 h-32 rounded-full items-center justify-center mb-8"
-            style={{ backgroundColor: theme.backgroundMint }}
-          >
-            <View
-              className="w-24 h-24 rounded-full items-center justify-center"
-              style={{ backgroundColor: theme.primary }}
-            >
-              <Text className="text-5xl text-white">✓</Text>
+          <View style={styles.iconOuter}>
+            <View style={styles.iconInner}>
+              <Text style={styles.iconText}>✓</Text>
             </View>
           </View>
 
           {/* Success Title */}
-          <Text
-            className="text-4xl font-poppins-bold mb-4"
-            style={{ color: theme.heading }}
-          >
-            Success!
-          </Text>
+          <Text style={styles.title}>Success!</Text>
 
           {/* Success Message */}
-          <Text
-            className="text-base font-inter text-center mb-2"
-            style={{ color: theme.textSecondary }}
-          >
+          <Text style={styles.message}>
             You have successfully created your order.
           </Text>
 
           {/* Order ID */}
-          <Text
-            className="text-sm font-inter text-center mb-12"
-            style={{ color: theme.textLight }}
-          >
-            Order ID: {orderId}
-          </Text>
+          <Text style={styles.orderId}>Order ID: {orderId}</Text>
 
           {/* Browse Home Button */}
           <TouchableOpacity
-            className="w-full py-5 rounded-full items-center justify-center"
-            style={{ backgroundColor: theme.primary }}
+            style={styles.button}
             onPress={handleBrowseHome}
             activeOpacity={0.8}
           >
-            <Text className="text-white text-lg font-poppins-semibold">Browse Home</Text>
+            <Text style={styles.buttonText}>Browse Home</Text>
           </TouchableOpacity>
         </View>
       </SafeAreaView>

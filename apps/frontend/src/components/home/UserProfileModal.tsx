@@ -6,6 +6,7 @@ import {
   Modal,
   ScrollView,
   Pressable,
+  StyleSheet,
 } from 'react-native';
 import { useTheme } from '../../theme/ThemeContext';
 import { getFontSizes, getSpacing } from '../../utils/responsive';
@@ -50,6 +51,116 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
     return user?.primaryEmailAddress?.emailAddress || user?.email || 'No email';
   };
 
+  const styles = StyleSheet.create({
+    overlay: {
+      flex: 1,
+      justifyContent: 'flex-start',
+      backgroundColor: 'rgba(0,0,0,0.5)',
+    },
+    modalContent: {
+      borderBottomLeftRadius: 24,
+      borderBottomRightRadius: 24,
+      backgroundColor: theme.background,
+      marginTop: 0,
+      paddingTop: spacing.xl * 2,
+      paddingBottom: spacing.xl,
+      paddingHorizontal: spacing.lg,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.3,
+      shadowRadius: 8,
+      elevation: 8,
+    },
+    userInfo: {
+      alignItems: 'center',
+      marginBottom: 24,
+    },
+    avatar: {
+      borderRadius: 40,
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginBottom: 16,
+      width: 80,
+      height: 80,
+      backgroundColor: theme.primary,
+    },
+    avatarText: {
+      color: '#FFFFFF',
+      fontFamily: 'Poppins_700Bold',
+      fontSize: fontSizes.h1,
+    },
+    displayName: {
+      fontFamily: 'Poppins_700Bold',
+      textAlign: 'center',
+      fontSize: fontSizes.h3,
+      color: theme.heading,
+    },
+    email: {
+      fontFamily: 'Inter_400Regular',
+      textAlign: 'center',
+      marginTop: 4,
+      fontSize: fontSizes.body,
+      color: theme.textSecondary,
+    },
+    themeToggle: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      paddingVertical: 16,
+      paddingHorizontal: 16,
+      borderRadius: 16,
+      marginBottom: 12,
+      backgroundColor: theme.backgroundCard,
+    },
+    themeToggleLeft: {
+      flexDirection: 'row',
+      alignItems: 'center',
+    },
+    themeIcon: {
+      fontSize: fontSizes.h3,
+      marginRight: spacing.md,
+    },
+    themeText: {
+      fontFamily: 'Poppins_500Medium',
+      fontSize: fontSizes.body,
+      color: theme.text,
+    },
+    themeSwitch: {
+      width: 48,
+      height: 24,
+      borderRadius: 12,
+      alignItems: 'center',
+      flexDirection: 'row',
+      paddingHorizontal: 4,
+      backgroundColor: isDark ? theme.primary : theme.border,
+    },
+    themeSwitchCircle: {
+      width: 20,
+      height: 20,
+      borderRadius: 10,
+      backgroundColor: isDark ? '#FFFFFF' : theme.primary,
+      transform: [{ translateX: isDark ? 20 : 0 }],
+    },
+    logoutButton: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      paddingVertical: 16,
+      paddingHorizontal: 16,
+      borderRadius: 16,
+      backgroundColor: theme.accentRed,
+    },
+    logoutIcon: {
+      fontSize: fontSizes.h4,
+      marginRight: spacing.sm,
+    },
+    logoutText: {
+      color: '#FFFFFF',
+      fontFamily: 'Poppins_600SemiBold',
+      fontSize: fontSizes.body,
+    },
+  });
+
   return (
     <Modal
       visible={visible}
@@ -57,91 +168,38 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
       animationType="fade"
       onRequestClose={onClose}
     >
-      <Pressable
-        className="flex-1 justify-start"
-        style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}
-        onPress={onClose}
-      >
+      <Pressable style={styles.overlay} onPress={onClose}>
         <Pressable
-          className="rounded-b-3xl"
-          style={{
-            backgroundColor: theme.background,
-            marginTop: 0,
-            paddingTop: spacing.xl * 2,
-            paddingBottom: spacing.xl,
-            paddingHorizontal: spacing.lg,
-            shadowColor: '#000',
-            shadowOffset: { width: 0, height: 4 },
-            shadowOpacity: 0.3,
-            shadowRadius: 8,
-            elevation: 8,
-          }}
+          style={styles.modalContent}
           onPress={(e) => e.stopPropagation()}
         >
           <ScrollView showsVerticalScrollIndicator={false}>
             {/* User Avatar and Info */}
-            <View className="items-center mb-6">
-              <View
-                className="rounded-full items-center justify-center mb-4"
-                style={{
-                  width: 80,
-                  height: 80,
-                  backgroundColor: theme.primary,
-                }}
-              >
-                <Text
-                  className="text-white font-poppins-bold"
-                  style={{ fontSize: fontSizes.h1 }}
-                >
-                  {getInitial()}
-                </Text>
+            <View style={styles.userInfo}>
+              <View style={styles.avatar}>
+                <Text style={styles.avatarText}>{getInitial()}</Text>
               </View>
               
-              <Text
-                className="font-poppins-bold text-center"
-                style={{ fontSize: fontSizes.h3, color: theme.heading }}
-              >
-                {getDisplayName()}
-              </Text>
+              <Text style={styles.displayName}>{getDisplayName()}</Text>
               
-              <Text
-                className="font-inter text-center mt-1"
-                style={{ fontSize: fontSizes.body, color: theme.textSecondary }}
-              >
-                {getEmail()}
-              </Text>
+              <Text style={styles.email}>{getEmail()}</Text>
             </View>
 
             {/* Theme Toggle */}
             <TouchableOpacity
               onPress={toggleTheme}
-              className="flex-row items-center justify-between py-4 px-4 rounded-2xl mb-3"
-              style={{ backgroundColor: theme.backgroundCard }}
+              style={styles.themeToggle}
               activeOpacity={0.7}
             >
-              <View className="flex-row items-center">
-                <Text style={{ fontSize: fontSizes.h3, marginRight: spacing.md }}>
-                  {isDark ? '🌙' : '☀️'}
-                </Text>
-                <Text
-                  className="font-poppins-medium"
-                  style={{ fontSize: fontSizes.body, color: theme.text }}
-                >
+              <View style={styles.themeToggleLeft}>
+                <Text style={styles.themeIcon}>{isDark ? '🌙' : '☀️'}</Text>
+                <Text style={styles.themeText}>
                   {isDark ? 'Dark Mode' : 'Light Mode'}
                 </Text>
               </View>
               
-              <View
-                className="w-12 h-6 rounded-full items-center flex-row px-1"
-                style={{ backgroundColor: isDark ? theme.primary : theme.border }}
-              >
-                <View
-                  className="w-5 h-5 rounded-full"
-                  style={{
-                    backgroundColor: isDark ? '#FFFFFF' : theme.primary,
-                    transform: [{ translateX: isDark ? 20 : 0 }],
-                  }}
-                />
+              <View style={styles.themeSwitch}>
+                <View style={styles.themeSwitchCircle} />
               </View>
             </TouchableOpacity>
 
@@ -151,19 +209,11 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
                 onClose();
                 onLogout();
               }}
-              className="flex-row items-center justify-center py-4 px-4 rounded-2xl"
-              style={{ backgroundColor: theme.accentRed }}
+              style={styles.logoutButton}
               activeOpacity={0.7}
             >
-              <Text style={{ fontSize: fontSizes.h4, marginRight: spacing.sm }}>
-                🚪
-              </Text>
-              <Text
-                className="text-white font-poppins-semibold"
-                style={{ fontSize: fontSizes.body }}
-              >
-                Logout
-              </Text>
+              <Text style={styles.logoutIcon}>🚪</Text>
+              <Text style={styles.logoutText}>Logout</Text>
             </TouchableOpacity>
           </ScrollView>
         </Pressable>
@@ -171,4 +221,3 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
     </Modal>
   );
 };
-

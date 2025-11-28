@@ -1,5 +1,5 @@
 import { initializeApp, getApps, FirebaseApp } from 'firebase/app';
-import { getAuth, Auth } from 'firebase/auth';
+import { initializeAuth, getAuth, Auth } from 'firebase/auth';
 import { getFirestore, Firestore } from 'firebase/firestore';
 import Constants from 'expo-constants';
 
@@ -21,11 +21,18 @@ let db: Firestore;
 
 if (getApps().length === 0) {
   app = initializeApp(firebaseConfig);
-  auth = getAuth(app);
+  // initializeAuth automatically handles persistence in React Native/Expo
+  // It uses AsyncStorage internally, so no explicit persistence config needed
+  auth = initializeAuth(app);
   db = getFirestore(app);
 } else {
   app = getApps()[0];
-  auth = getAuth(app);
+  try {
+    auth = getAuth(app);
+  } catch {
+    // If auth not initialized, initialize it now
+    auth = initializeAuth(app);
+  }
   db = getFirestore(app);
 }
 

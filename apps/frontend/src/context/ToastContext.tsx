@@ -96,7 +96,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     left: 24,
     right: 24,
-    top: 150, // Moved to top, below status bar
+    bottom: 20, // Moved to top, below status bar
     borderRadius: 12, // Smaller border radius
     paddingVertical: 10, // Smaller padding
     paddingHorizontal: 16, // Smaller padding

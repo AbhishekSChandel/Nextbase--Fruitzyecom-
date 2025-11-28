@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, ScrollView } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Image } from 'expo-image';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -63,16 +63,185 @@ export const ProductDetailScreen: React.FC<Props> = ({ route, navigation }) => {
     }
   };
 
+  const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: theme.background,
+    },
+    safeArea: {
+      flex: 1,
+    },
+    header: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      paddingHorizontal: 24,
+      paddingTop: 16,
+    },
+    backButton: {
+      width: 64,
+      height: 64,
+      borderRadius: 32,
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: theme.backgroundCard,
+    },
+    cartButton: {
+      width: 64,
+      height: 64,
+      borderRadius: 16,
+      alignItems: 'center',
+      justifyContent: 'center',
+      position: 'relative',
+      backgroundColor: theme.backgroundCard,
+    },
+    badge: {
+      position: 'absolute',
+      borderRadius: 10,
+      alignItems: 'center',
+      justifyContent: 'center',
+      top: 8,
+      right: 8,
+      width: 20,
+      height: 20,
+      backgroundColor: theme.accentRed,
+    },
+    badgeText: {
+      color: '#FFFFFF',
+      fontFamily: 'Poppins_700Bold',
+      fontSize: fontSizes.caption,
+    },
+    imageContainer: {
+      alignItems: 'center',
+      paddingVertical: 32,
+    },
+    productImage: {
+      width: 300,
+      height: 300,
+    },
+    favoriteButton: {
+      position: 'absolute',
+      bottom: 48,
+      right: 48,
+      width: 64,
+      height: 64,
+      borderRadius: 32,
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: isFavorite ? theme.accentRed : theme.backgroundCard,
+    },
+    infoContainer: {
+      paddingHorizontal: 24,
+    },
+    shippingBadge: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginBottom: 16,
+    },
+    shippingText: {
+      fontFamily: 'Poppins_500Medium',
+      marginLeft: 8,
+      color: theme.primary,
+      fontSize: fontSizes.body,
+    },
+    productName: {
+      fontFamily: 'Poppins_700Bold',
+      marginBottom: 16,
+      color: theme.heading,
+      fontSize: fontSizes.h2,
+    },
+    ratingRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginBottom: 24,
+    },
+    ratingBadge: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      paddingHorizontal: 16,
+      paddingVertical: 8,
+      borderRadius: 25,
+      marginRight: 12,
+      backgroundColor: theme.backgroundCard,
+    },
+    ratingText: {
+      fontFamily: 'Poppins_600SemiBold',
+      marginLeft: 4,
+      color: theme.text,
+      fontSize: fontSizes.body,
+    },
+    categoryBadge: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      paddingHorizontal: 16,
+      paddingVertical: 8,
+      borderRadius: 25,
+      backgroundColor: theme.backgroundMint,
+    },
+    categoryText: {
+      fontFamily: 'Poppins_500Medium',
+      color: theme.heading,
+      fontSize: fontSizes.body,
+    },
+    priceContainer: {
+      flex: 1,
+      alignItems: 'flex-end',
+    },
+    priceRow: {
+      flexDirection: 'row',
+      alignItems: 'baseline',
+    },
+    stockWarning: {
+      marginBottom: 16,
+    },
+    quantityRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginBottom: 32,
+    },
+    quantitySelector: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginRight: 16,
+    },
+    quantityButton: {
+      width: 56,
+      height: 56,
+      borderRadius: 16,
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: theme.backgroundCard,
+    },
+    quantityText: {
+      fontSize: 24,
+      fontFamily: 'Poppins_700Bold',
+      marginHorizontal: 24,
+      color: theme.heading,
+    },
+    addButton: {
+      flex: 1,
+      paddingVertical: 20,
+      borderRadius: 25,
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: theme.primary,
+    },
+    addButtonText: {
+      color: '#FFFFFF',
+      fontSize: 18,
+      fontFamily: 'Poppins_600SemiBold',
+    },
+  });
+
   return (
-    <View className="flex-1" style={{ backgroundColor: theme.background }}>
-      <SafeAreaView className="flex-1">
+    <View style={styles.container}>
+      <SafeAreaView style={styles.safeArea}>
         <ScrollView showsVerticalScrollIndicator={false}>
           {/* Header */}
-          <View className="flex-row items-center justify-between px-6 pt-4">
+          <View style={styles.header}>
             {/* Back Button */}
             <TouchableOpacity
-              className="w-16 h-16 rounded-full items-center justify-center"
-              style={{ backgroundColor: theme.backgroundCard }}
+              style={styles.backButton}
               onPress={() => navigation.goBack()}
             >
               <BackIcon size={24} color={theme.text} />
@@ -80,26 +249,13 @@ export const ProductDetailScreen: React.FC<Props> = ({ route, navigation }) => {
 
             {/* Cart Icon with Badge */}
             <TouchableOpacity
-              className="w-16 h-16 rounded-2xl items-center justify-center relative"
-              style={{ backgroundColor: theme.backgroundCard }}
+              style={styles.cartButton}
               onPress={() => navigation.navigate('Cart')}
             >
               <CartIcon size={26} color={theme.textSecondary} />
               {cartCount > 0 && (
-                <View
-                  className="absolute rounded-full items-center justify-center"
-                  style={{
-                    top: 8,
-                    right: 8,
-                    width: 20,
-                    height: 20,
-                    backgroundColor: theme.accentRed,
-                  }}
-                >
-                  <Text
-                    className="text-white font-poppins-bold"
-                    style={{ fontSize: fontSizes.caption }}
-                  >
+                <View style={styles.badge}>
+                  <Text style={styles.badgeText}>
                     {cartCount > 9 ? '9+' : cartCount}
                   </Text>
                 </View>
@@ -108,10 +264,10 @@ export const ProductDetailScreen: React.FC<Props> = ({ route, navigation }) => {
           </View>
 
           {/* Product Image */}
-          <View className="items-center py-8">
+          <View style={styles.imageContainer}>
             <Image
               source={getProductImageSource(product)}
-              style={{ width: 300, height: 300 }}
+              style={styles.productImage}
               contentFit="contain"
               transition={300}
               cachePolicy="memory-disk"
@@ -119,10 +275,7 @@ export const ProductDetailScreen: React.FC<Props> = ({ route, navigation }) => {
 
             {/* Favorite Button */}
             <TouchableOpacity
-              className="absolute bottom-12 right-12 w-16 h-16 rounded-full items-center justify-center"
-              style={{
-                backgroundColor: isFavorite ? theme.accentRed : theme.backgroundCard,
-              }}
+              style={styles.favoriteButton}
               onPress={() => setIsFavorite(!isFavorite)}
               activeOpacity={0.8}
             >
@@ -135,59 +288,33 @@ export const ProductDetailScreen: React.FC<Props> = ({ route, navigation }) => {
           </View>
 
           {/* Product Info */}
-          <View className="px-6">
+          <View style={styles.infoContainer}>
             {/* Free Shipping Badge */}
-            <View className="flex-row items-center mb-4">
+            <View style={styles.shippingBadge}>
               <TruckIcon size={22} color={theme.primary} />
-              <Text
-                className="font-poppins-medium ml-2"
-                style={{ color: theme.primary, fontSize: fontSizes.body }}
-              >
-                Free shipping
-              </Text>
+              <Text style={styles.shippingText}>Free shipping</Text>
             </View>
 
             {/* Product Name */}
-            <Text
-              className="font-poppins-bold mb-4"
-              style={{ color: theme.heading, fontSize: fontSizes.h2 }}
-            >
-              {product.name}
-            </Text>
+            <Text style={styles.productName}>{product.name}</Text>
 
             {/* Rating and Category */}
-            <View className="flex-row items-center mb-6">
+            <View style={styles.ratingRow}>
               {/* Rating */}
-              <View
-                className="flex-row items-center px-4 py-2 rounded-full mr-3"
-                style={{ backgroundColor: theme.backgroundCard }}
-              >
+              <View style={styles.ratingBadge}>
                 <StarIcon size={16} color="#FFB800" filled />
-                <Text
-                  className="font-poppins-semibold ml-1"
-                  style={{ color: theme.text, fontSize: fontSizes.body }}
-                >
-                  4.7
-                </Text>
+                <Text style={styles.ratingText}>4.7</Text>
               </View>
 
               {/* Category */}
-              <View
-                className="flex-row items-center px-4 py-2 rounded-full"
-                style={{ backgroundColor: theme.backgroundMint }}
-              >
+              <View style={styles.categoryBadge}>
                 <Text style={{ fontSize: fontSizes.body }}>🥭</Text>
-                <Text
-                  className="font-poppins-medium"
-                  style={{ color: theme.heading, fontSize: fontSizes.body }}
-                >
-                  Fruits
-                </Text>
+                <Text style={styles.categoryText}>Fruits</Text>
               </View>
 
               {/* Price */}
-              <View className="flex-1 items-end">
-                <View className="flex-row items-baseline">
+              <View style={styles.priceContainer}>
+                <View style={styles.priceRow}>
                   <Text style={typography.price}>
                     $ {product.price.toFixed(1)}
                   </Text>
@@ -208,7 +335,7 @@ export const ProductDetailScreen: React.FC<Props> = ({ route, navigation }) => {
 
             {/* Stock Info */}
             {product.stock < 10 && (
-              <View className="mb-4">
+              <View style={styles.stockWarning}>
                 <Text style={[typography.bodySmall, { color: theme.accentOrange }]}>
                   ⚠️ Only {product.stock} left in stock!
                 </Text>
@@ -216,13 +343,12 @@ export const ProductDetailScreen: React.FC<Props> = ({ route, navigation }) => {
             )}
 
             {/* Quantity and Add to Bag */}
-            <View className="flex-row items-center mb-8">
+            <View style={styles.quantityRow}>
               {/* Quantity Selector */}
-              <View className="flex-row items-center mr-4">
+              <View style={styles.quantitySelector}>
                 {/* Minus Button */}
                 <TouchableOpacity
-                  className="w-14 h-14 rounded-2xl items-center justify-center"
-                  style={{ backgroundColor: theme.backgroundCard }}
+                  style={styles.quantityButton}
                   onPress={decrementQuantity}
                   disabled={quantity <= 1}
                 >
@@ -233,17 +359,11 @@ export const ProductDetailScreen: React.FC<Props> = ({ route, navigation }) => {
                 </TouchableOpacity>
 
                 {/* Quantity Display */}
-                <Text
-                  className="text-2xl font-poppins-bold mx-6"
-                  style={{ color: theme.heading }}
-                >
-                  {quantity}
-                </Text>
+                <Text style={styles.quantityText}>{quantity}</Text>
 
                 {/* Plus Button */}
                 <TouchableOpacity
-                  className="w-14 h-14 rounded-2xl items-center justify-center"
-                  style={{ backgroundColor: theme.backgroundCard }}
+                  style={styles.quantityButton}
                   onPress={incrementQuantity}
                 >
                   <AddIcon size={24} color={theme.primary} />
@@ -252,14 +372,11 @@ export const ProductDetailScreen: React.FC<Props> = ({ route, navigation }) => {
 
               {/* Add to Bag Button */}
               <TouchableOpacity
-                className="flex-1 py-5 rounded-full items-center justify-center"
-                style={{ backgroundColor: theme.primary }}
+                style={styles.addButton}
                 onPress={handleAddToBag}
                 activeOpacity={0.8}
               >
-                <Text className="text-white text-lg font-poppins-semibold">
-                  Add to bag
-                </Text>
+                <Text style={styles.addButtonText}>Add to bag</Text>
               </TouchableOpacity>
             </View>
           </View>

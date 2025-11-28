@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { Image } from 'expo-image';
 import { useTheme } from '../../theme/ThemeContext';
 import { Product, getProductImageSource } from '../../services/productService';
@@ -22,30 +22,87 @@ export const HorizontalProductCard: React.FC<HorizontalProductCardProps> = ({
 
   const isOutOfStock = product.stock === 0;
 
+  const styles = StyleSheet.create({
+    card: {
+      overflow: 'hidden',
+      flexDirection: 'row',
+      marginBottom: 16,
+      borderRadius: 24,
+      backgroundColor: theme.cardHighlight,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.1,
+      shadowRadius: 8,
+      elevation: 3,
+      height: 140,
+      opacity: isOutOfStock ? 0.6 : 1,
+    },
+    imageContainer: {
+      justifyContent: 'center',
+      alignItems: 'center',
+      width: 144,
+      height: '100%',
+      backgroundColor: theme.cardHighlight,
+    },
+    image: {
+      width: 120,
+      height: 120,
+    },
+    infoContainer: {
+      flex: 1,
+      justifyContent: 'space-between',
+      padding: 16,
+    },
+    topRow: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'flex-start',
+    },
+    productName: {
+      flex: 1,
+    },
+    heartButton: {
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginLeft: 8,
+      width: 36,
+      height: 36,
+      borderRadius: 18,
+      backgroundColor: isFavorite ? theme.accentRed : 'transparent',
+    },
+    bottomRow: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'flex-end',
+    },
+    priceContainer: {
+      flexDirection: 'row',
+      alignItems: 'baseline',
+    },
+    priceUnit: {
+      marginLeft: 4,
+    },
+    addButton: {
+      justifyContent: 'center',
+      alignItems: 'center',
+      width: 56,
+      height: 56,
+      borderRadius: 16,
+      backgroundColor: theme.primary,
+    },
+  });
+
   return (
     <TouchableOpacity
-      className="overflow-hidden flex-row mb-4 rounded-3xl"
-      style={{
-        backgroundColor: theme.cardHighlight,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 8,
-        elevation: 3,
-        height: 140,
-        opacity: isOutOfStock ? 0.6 : 1,
-      }}
+      style={styles.card}
       onPress={onPress}
       activeOpacity={0.9}
     >
       {/* Product Image - Left Side */}
-      <View
-        className="justify-center items-center w-36 h-full"
-        style={{ backgroundColor: theme.cardHighlight }}
-      >
+      <View style={styles.imageContainer}>
         <Image
           source={getProductImageSource(product)}
-          style={{ width: 120, height: 120 }}
+          style={styles.image}
           contentFit="contain"
           transition={200}
           cachePolicy="memory-disk"
@@ -53,11 +110,11 @@ export const HorizontalProductCard: React.FC<HorizontalProductCardProps> = ({
       </View>
 
       {/* Product Info - Right Side */}
-      <View className="flex-1 justify-between p-4">
+      <View style={styles.infoContainer}>
         {/* Top Row: Name and Heart */}
-        <View className="flex-row justify-between items-start">
+        <View style={styles.topRow}>
           <Text
-            style={[typography.h4, { flex: 1, color: theme.text }]}
+            style={[typography.h4, styles.productName, { color: theme.text }]}
             numberOfLines={2}
           >
             {product.name}
@@ -65,8 +122,7 @@ export const HorizontalProductCard: React.FC<HorizontalProductCardProps> = ({
 
           {/* Favorite Heart Icon */}
           <TouchableOpacity
-            className="justify-center items-center ml-2 w-9 h-9 rounded-full"
-            style={{ backgroundColor: isFavorite ? theme.accentRed : 'transparent' }}
+            style={styles.heartButton}
             onPress={(e) => {
               e.stopPropagation();
               setIsFavorite(!isFavorite);
@@ -82,13 +138,13 @@ export const HorizontalProductCard: React.FC<HorizontalProductCardProps> = ({
         </View>
 
         {/* Bottom Row: Price and Add Button */}
-        <View className="flex-row justify-between items-end">
+        <View style={styles.bottomRow}>
           {/* Price */}
-          <View className="flex-row items-baseline">
+          <View style={styles.priceContainer}>
             <Text style={typography.price}>
               $ {product.price.toFixed(1)}
             </Text>
-            <Text style={[typography.priceUnit, { marginLeft: 4, color: theme.textSecondary }]}>
+            <Text style={[typography.priceUnit, styles.priceUnit, { color: theme.textSecondary }]}>
               /kg
             </Text>
           </View>
@@ -100,8 +156,7 @@ export const HorizontalProductCard: React.FC<HorizontalProductCardProps> = ({
             </Text>
           ) : (
             <TouchableOpacity
-              className="justify-center items-center w-14 h-14 rounded-2xl"
-              style={{ backgroundColor: theme.primary }}
+              style={styles.addButton}
               onPress={(e) => {
                 e.stopPropagation();
                 onAddToCart?.();

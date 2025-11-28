@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { useTheme } from '../../theme/ThemeContext';
 import { CartIcon } from '../common/Icon';
 import { getComponentSizes, getFontSizes, getSpacing } from '../../utils/responsive';
@@ -26,7 +26,6 @@ export const Header: React.FC<HeaderProps> = ({
 
   // Get first letter of user's name for avatar
   const getInitial = () => {
-    // Try to get name from Clerk user object
     const firstName = user?.firstName;
     const lastName = user?.lastName;
     const fullName = user?.fullName;
@@ -38,14 +37,12 @@ export const Header: React.FC<HeaderProps> = ({
 
   // Get username (first name or email prefix)
   const getUsername = () => {
-    // Try Clerk properties first
     if (user?.firstName) {
       return user.firstName;
     }
     if (user?.fullName) {
       return user.fullName.split(' ')[0];
     }
-    // Fallback to email
     const email = user?.primaryEmailAddress?.emailAddress || user?.email;
     if (email) {
       return email.split('@')[0];
@@ -53,94 +50,107 @@ export const Header: React.FC<HeaderProps> = ({
     return 'User';
   };
 
+  const styles = StyleSheet.create({
+    container: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      paddingHorizontal: spacing.lg,
+      paddingTop: spacing.md,
+      paddingBottom: spacing.sm,
+    },
+    avatar: {
+      borderRadius: sizes.avatarSize / 2,
+      alignItems: 'center',
+      justifyContent: 'center',
+      width: sizes.avatarSize,
+      height: sizes.avatarSize,
+      backgroundColor: theme.primary,
+    },
+    avatarText: {
+      color: '#FFFFFF',
+      fontFamily: 'Poppins_700Bold',
+      fontSize: fontSizes.h4,
+    },
+    usernameButton: {
+      flex: 1,
+      alignItems: 'center',
+      marginHorizontal: 16,
+    },
+    usernameContainer: {
+      borderRadius: 25,
+      flexDirection: 'row',
+      alignItems: 'center',
+      paddingHorizontal: spacing.lg,
+      paddingVertical: spacing.sm,
+      backgroundColor: theme.backgroundCard,
+    },
+    usernameText: {
+      fontFamily: 'Poppins_500Medium',
+      fontSize: fontSizes.body,
+      color: theme.text,
+    },
+    dropdownIcon: {
+      marginLeft: 8,
+      fontSize: fontSizes.bodySmall,
+      color: theme.textSecondary,
+    },
+    cartButton: {
+      borderRadius: 16,
+      alignItems: 'center',
+      justifyContent: 'center',
+      position: 'relative',
+      width: sizes.avatarSize,
+      height: sizes.avatarSize,
+      backgroundColor: theme.backgroundCard,
+    },
+    badge: {
+      position: 'absolute',
+      borderRadius: 10,
+      alignItems: 'center',
+      justifyContent: 'center',
+      top: 8,
+      right: 8,
+      width: 20,
+      height: 20,
+      backgroundColor: theme.accentRed,
+    },
+    badgeText: {
+      color: '#FFFFFF',
+      fontFamily: 'Poppins_700Bold',
+      fontSize: fontSizes.caption,
+    },
+  });
+
   return (
     <>
-      <View
-        className="flex-row items-center justify-between"
-        style={{
-          paddingHorizontal: spacing.lg,
-          paddingTop: spacing.md,
-          paddingBottom: spacing.sm,
-        }}
-      >
+      <View style={styles.container}>
         {/* Left: Avatar with initial - Static (non-clickable) */}
-        <View
-          className="rounded-full items-center justify-center"
-          style={{
-            width: sizes.avatarSize,
-            height: sizes.avatarSize,
-            backgroundColor: theme.primary,
-          }}
-        >
-          <Text
-            className="text-white font-poppins-bold"
-            style={{ fontSize: fontSizes.h4 }}
-          >
-            {getInitial()}
-          </Text>
+        <View style={styles.avatar}>
+          <Text style={styles.avatarText}>{getInitial()}</Text>
         </View>
 
         {/* Center: Username with dropdown indicator - Clickable */}
         <TouchableOpacity
-          className="flex-1 items-center mx-4"
+          style={styles.usernameButton}
           onPress={() => setShowProfileModal(true)}
           activeOpacity={0.7}
         >
-          <View
-            className="rounded-full flex-row items-center"
-            style={{
-              paddingHorizontal: spacing.lg,
-              paddingVertical: spacing.sm,
-              backgroundColor: theme.backgroundCard,
-            }}
-          >
-            <Text
-              className="font-poppins-medium"
-              style={{
-                fontSize: fontSizes.body,
-                color: theme.text,
-              }}
-            >
-              {getUsername()}'s Home
-            </Text>
-            <Text
-              className="ml-2"
-              style={{
-                fontSize: fontSizes.bodySmall,
-                color: theme.textSecondary,
-              }}
-            >
-              ▼
-            </Text>
+          <View style={styles.usernameContainer}>
+            <Text style={styles.usernameText}>{getUsername()}'s Home</Text>
+            <Text style={styles.dropdownIcon}>▼</Text>
           </View>
         </TouchableOpacity>
 
         {/* Right: Cart icon with badge */}
         <TouchableOpacity
-          className="rounded-2xl items-center justify-center relative"
-          style={{
-            width: sizes.avatarSize,
-            height: sizes.avatarSize,
-            backgroundColor: theme.backgroundCard,
-          }}
+          style={styles.cartButton}
           onPress={onCartPress}
         >
           <CartIcon size={sizes.iconLarge} color={theme.textSecondary} />
           {cartItemCount > 0 && (
-            <View
-              className="absolute rounded-full items-center justify-center"
-              style={{
-                top: 8,
-                right: 8,
-                width: 20,
-                height: 20,
-                backgroundColor: theme.accentRed,
-              }}
-            >
-              <Text
-                className="text-white font-poppins-bold"
-                style={{ fontSize: fontSizes.caption }}
-              >
+            <View style={styles.badge}>
+              <Text style={styles.badgeText}>
                 {cartItemCount > 9 ? '9+' : cartItemCount}
               </Text>
             </View>

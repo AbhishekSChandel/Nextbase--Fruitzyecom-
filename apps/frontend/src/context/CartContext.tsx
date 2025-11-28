@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useMemo, ReactNode } from 'react';
 import { Product } from '../services/productService';
 
 export interface CartItem {
@@ -35,13 +35,19 @@ interface CartProviderProps {
 export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
 
-  // Calculate cart count (total items)
-  const cartCount = cartItems.reduce((total, item) => total + item.quantity, 0);
+  // Calculate cart count (total items) - Memoized for performance
+  const cartCount = useMemo(
+    () => cartItems.reduce((total, item) => total + item.quantity, 0),
+    [cartItems]
+  );
 
-  // Calculate cart total price
-  const cartTotal = cartItems.reduce(
-    (total, item) => total + item.product.price * item.quantity,
-    0
+  // Calculate cart total price - Memoized for performance
+  const cartTotal = useMemo(
+    () => cartItems.reduce(
+      (total, item) => total + item.product.price * item.quantity,
+      0
+    ),
+    [cartItems]
   );
 
   // Add product to cart

@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { useTheme } from '../../theme/ThemeContext';
 import { SearchIcon, ScanIcon } from '../common/Icon';
 
@@ -11,29 +11,59 @@ interface SearchBarProps {
 export const SearchBar: React.FC<SearchBarProps> = ({ onSearchPress, onScanPress }) => {
   const { theme } = useTheme();
 
+  const styles = StyleSheet.create({
+    container: {
+      paddingHorizontal: 24,
+      marginTop: 16,
+      marginBottom: 8,
+    },
+    row: {
+      flexDirection: 'row',
+      alignItems: 'center',
+    },
+    searchButton: {
+      flex: 1,
+      flexDirection: 'row',
+      alignItems: 'center',
+      paddingHorizontal: 16,
+      paddingVertical: 16,
+      borderRadius: 16,
+      marginRight: 12,
+      backgroundColor: theme.backgroundCard,
+    },
+    searchText: {
+      flex: 1,
+      fontSize: 16,
+      fontFamily: 'Inter_400Regular',
+      marginLeft: 12,
+      color: theme.textLight,
+    },
+    scanButton: {
+      width: 56,
+      height: 56,
+      borderRadius: 16,
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: theme.primary,
+    },
+  });
+
   return (
-    <View className="px-6 mt-4 mb-2">
-      <View className="flex-row items-center">
+    <View style={styles.container}>
+      <View style={styles.row}>
         {/* Search Input */}
         <TouchableOpacity
-          className="flex-1 flex-row items-center px-4 py-4 rounded-2xl mr-3"
-          style={{ backgroundColor: theme.backgroundCard }}
+          style={styles.searchButton}
           onPress={onSearchPress}
           activeOpacity={0.7}
         >
           <SearchIcon size={22} color={theme.primary} />
-          <Text
-            className="flex-1 text-base font-inter ml-3"
-            style={{ color: theme.textLight }}
-          >
-            Search fresh groceries
-          </Text>
+          <Text style={styles.searchText}>Search fresh groceries</Text>
         </TouchableOpacity>
 
         {/* Scan Button */}
         <TouchableOpacity
-          className="w-14 h-14 rounded-2xl items-center justify-center"
-          style={{ backgroundColor: theme.primary }}
+          style={styles.scanButton}
           onPress={onScanPress}
           activeOpacity={0.7}
         >

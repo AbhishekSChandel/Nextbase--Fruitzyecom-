@@ -1,26 +1,49 @@
 import React from 'react';
-import { TouchableOpacity, Text, View } from 'react-native';
+import { TouchableOpacity, Text, View, StyleSheet } from 'react-native';
 import { useTheme } from '../theme/ThemeContext';
 
 export const ThemeToggle: React.FC = () => {
   const { isDark, toggleTheme, theme } = useTheme();
 
+  const styles = StyleSheet.create({
+    container: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      paddingHorizontal: 24,
+      paddingVertical: 12,
+      borderRadius: 25,
+      backgroundColor: theme.backgroundCard,
+    },
+    toggleContainer: {
+      width: 48,
+      height: 24,
+      borderRadius: 12,
+      alignItems: 'center',
+      flexDirection: 'row',
+      paddingHorizontal: 4,
+      backgroundColor: theme.border,
+    },
+    toggleCircle: {
+      width: 20,
+      height: 20,
+      borderRadius: 10,
+      backgroundColor: theme.primary,
+      transform: [{ translateX: isDark ? 20 : 0 }],
+    },
+    text: {
+      marginLeft: 12,
+      fontSize: 16,
+      fontFamily: 'Poppins_500Medium',
+      color: theme.text,
+    },
+  });
+
   return (
-    <TouchableOpacity
-      onPress={toggleTheme}
-      className="flex-row items-center px-6 py-3 rounded-full"
-      style={{ backgroundColor: theme.backgroundCard }}
-    >
-      <View
-        className="w-12 h-6 rounded-full items-center flex-row px-1"
-        style={{ backgroundColor: theme.border }}
-      >
-        <View
-          className={`w-5 h-5 rounded-full ${isDark ? 'translate-x-5' : 'translate-x-0'}`}
-          style={{ backgroundColor: theme.primary }}
-        />
+    <TouchableOpacity onPress={toggleTheme} style={styles.container}>
+      <View style={styles.toggleContainer}>
+        <View style={styles.toggleCircle} />
       </View>
-      <Text className="ml-3 text-base font-poppins-medium" style={{ color: theme.text }}>
+      <Text style={styles.text}>
         {isDark ? '🌙 Dark Mode' : '☀️ Light Mode'}
       </Text>
     </TouchableOpacity>

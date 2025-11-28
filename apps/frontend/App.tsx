@@ -1,6 +1,5 @@
-import './global.css';
 import { StatusBar } from 'expo-status-bar';
-import { View, ActivityIndicator } from 'react-native';
+import { View, ActivityIndicator, StyleSheet } from 'react-native';
 import React, { useState, useEffect } from 'react';
 import {
   useFonts,
@@ -50,7 +49,7 @@ function AppContent() {
 
   if (!fontsLoaded || !clerkLoaded) {
     return (
-      <View className="flex-1 justify-center items-center bg-white">
+      <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color="#2ECC71" />
       </View>
     );
@@ -129,6 +128,15 @@ function AppContent() {
     </ThemeProvider>
   );
 }
+
+const styles = StyleSheet.create({
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#FFFFFF',
+  },
+});
 
 export default function App() {
   return (

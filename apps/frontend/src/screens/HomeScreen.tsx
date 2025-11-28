@@ -5,6 +5,7 @@ import {
   ScrollView,
   ActivityIndicator,
   TouchableOpacity,
+  StyleSheet,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -179,49 +180,102 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
     }
   };
 
+  const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: theme.background,
+    },
+    safeArea: {
+      flex: 1,
+    },
+    loadingContainer: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      backgroundColor: theme.background,
+    },
+    loadingText: {
+      marginTop: 16,
+      fontSize: 16,
+      fontFamily: 'Inter_400Regular',
+      color: theme.textSecondary,
+    },
+    errorContainer: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      paddingHorizontal: 24,
+      backgroundColor: theme.background,
+    },
+    errorEmoji: {
+      marginBottom: 16,
+      fontSize: 36,
+    },
+    errorTitle: {
+      marginBottom: 8,
+      fontSize: 20,
+      textAlign: 'center',
+      fontFamily: 'Poppins_600SemiBold',
+      color: theme.heading,
+    },
+    errorText: {
+      fontSize: 16,
+      textAlign: 'center',
+      fontFamily: 'Inter_400Regular',
+      color: theme.textSecondary,
+    },
+    loadingMoreContainer: {
+      alignItems: 'center',
+      paddingVertical: 16,
+    },
+    loadingMoreText: {
+      marginTop: 8,
+      fontSize: fontSizes.bodySmall,
+      fontFamily: 'Inter_400Regular',
+      color: theme.textSecondary,
+    },
+    endMessage: {
+      alignItems: 'center',
+      paddingVertical: 24,
+    },
+    endMessageText: {
+      textAlign: 'center',
+      fontSize: fontSizes.bodySmall,
+      fontFamily: 'Inter_400Regular',
+      color: theme.textSecondary,
+    },
+    refreshText: {
+      fontFamily: 'Inter_400Regular',
+      fontSize: fontSizes.caption,
+      color: theme.textSecondary,
+    },
+    spacer: {
+      height: 32,
+    },
+  });
+
   if (loading) {
     return (
-      <SafeAreaView
-        className="flex-1 justify-center items-center"
-        style={{ backgroundColor: theme.background }}
-      >
+      <SafeAreaView style={styles.loadingContainer}>
         <ActivityIndicator size="large" color={theme.primary} />
-        <Text
-          className="mt-4 text-base font-inter"
-          style={{ color: theme.textSecondary }}
-        >
-          Loading products...
-        </Text>
+        <Text style={styles.loadingText}>Loading products...</Text>
       </SafeAreaView>
     );
   }
 
   if (error) {
     return (
-      <SafeAreaView
-        className="flex-1 justify-center items-center px-6"
-        style={{ backgroundColor: theme.background }}
-      >
-        <Text className="mb-4 text-4xl">😔</Text>
-        <Text
-          className="mb-2 text-xl text-center font-poppins-semibold"
-          style={{ color: theme.heading }}
-        >
-          {error}
-        </Text>
-        <Text
-          className="text-base text-center font-inter"
-          style={{ color: theme.textSecondary }}
-        >
-          Please check your connection and try again
-        </Text>
+      <SafeAreaView style={styles.errorContainer}>
+        <Text style={styles.errorEmoji}>😔</Text>
+        <Text style={styles.errorTitle}>{error}</Text>
+        <Text style={styles.errorText}>Please check your connection and try again</Text>
       </SafeAreaView>
     );
   }
 
   return (
-    <View className="flex-1" style={{ backgroundColor: theme.background }}>
-      <SafeAreaView className="flex-1">
+    <View style={styles.container}>
+      <SafeAreaView style={styles.safeArea}>
         <ScrollView
           showsVerticalScrollIndicator={false}
           onScroll={handleScroll}
@@ -267,12 +321,10 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
                 activeOpacity={0.7}
               >
                 <Text
-                  className="font-inter"
-                  style={{
-                    fontSize: fontSizes.caption,
-                    color: theme.textSecondary,
-                    opacity: resetting ? 0.6 : 1,
-                  }}
+                  style={[
+                    styles.refreshText,
+                    { opacity: resetting ? 0.6 : 1 },
+                  ]}
                 >
                   Refresh
                 </Text>
@@ -291,14 +343,9 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
 
             {/* Loading More Indicator */}
             {loadingMore && (
-              <View className="items-center py-4">
+              <View style={styles.loadingMoreContainer}>
                 <ActivityIndicator size="small" color={theme.primary} />
-                <Text
-                  className="mt-2 font-inter"
-                  style={{ fontSize: fontSizes.bodySmall, color: theme.textSecondary }}
-                >
-                  Loading more products...
-                </Text>
+                <Text style={styles.loadingMoreText}>Loading more products...</Text>
               </View>
             )}
 
@@ -306,19 +353,14 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
             {!loadingMore &&
               displayedProducts.length >= allProducts.length &&
               allProducts.length > INITIAL_LOAD_COUNT && (
-                <View className="items-center py-6">
-                  <Text
-                    className="text-center font-inter"
-                    style={{ fontSize: fontSizes.bodySmall, color: theme.textSecondary }}
-                  >
-                    ✨ You've seen all products! ✨
-                  </Text>
+                <View style={styles.endMessage}>
+                  <Text style={styles.endMessageText}>✨ You've seen all products! ✨</Text>
                 </View>
               )}
           </View>
 
           {/* Spacer at bottom */}
-          <View className="h-8" />
+          <View style={styles.spacer} />
         </ScrollView>
       </SafeAreaView>
     </View>
