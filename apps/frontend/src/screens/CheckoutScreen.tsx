@@ -16,6 +16,7 @@ import { db } from '../services/firebase';
 import { BackIcon } from '../components/common/Icon';
 import { getFontSizes } from '../utils/responsive';
 import { useToast } from '../context/ToastContext';
+import { typography } from '../theme/typography';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Checkout'>;
 

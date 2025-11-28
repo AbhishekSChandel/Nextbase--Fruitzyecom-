@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import { useTheme } from '../../theme/ThemeContext';
 import { CartIcon } from '../common/Icon';
 import { getComponentSizes, getFontSizes, getSpacing } from '../../utils/responsive';
+import { UserProfileModal } from './UserProfileModal';
 
 interface HeaderProps {
   user: any;
@@ -21,20 +22,33 @@ export const Header: React.FC<HeaderProps> = ({
   const sizes = getComponentSizes();
   const fontSizes = getFontSizes();
   const spacing = getSpacing();
+  const [showProfileModal, setShowProfileModal] = useState(false);
 
   // Get first letter of user's name for avatar
   const getInitial = () => {
-    const displayName = user?.displayName || user?.email || 'U';
-    return displayName.charAt(0).toUpperCase();
+    // Try to get name from Clerk user object
+    const firstName = user?.firstName;
+    const lastName = user?.lastName;
+    const fullName = user?.fullName;
+    const email = user?.primaryEmailAddress?.emailAddress || user?.email;
+    
+    const name = firstName || lastName || fullName || email || 'U';
+    return name.charAt(0).toUpperCase();
   };
 
   // Get username (first name or email prefix)
   const getUsername = () => {
-    if (user?.displayName) {
-      return user.displayName.split(' ')[0];
+    // Try Clerk properties first
+    if (user?.firstName) {
+      return user.firstName;
     }
-    if (user?.email) {
-      return user.email.split('@')[0];
+    if (user?.fullName) {
+      return user.fullName.split(' ')[0];
+    }
+    // Fallback to email
+    const email = user?.primaryEmailAddress?.emailAddress || user?.email;
+    if (email) {
+      return email.split('@')[0];
     }
     return 'User';
   };
@@ -49,7 +63,7 @@ export const Header: React.FC<HeaderProps> = ({
           paddingBottom: spacing.sm,
         }}
       >
-        {/* Left: Avatar with initial */}
+        {/* Left: Avatar with initial - Static (non-clickable) */}
         <View
           className="rounded-full items-center justify-center"
           style={{
@@ -66,8 +80,12 @@ export const Header: React.FC<HeaderProps> = ({
           </Text>
         </View>
 
-        {/* Center: Username with dropdown indicator */}
-        <View className="flex-1 items-center mx-4">
+        {/* Center: Username with dropdown indicator - Clickable */}
+        <TouchableOpacity
+          className="flex-1 items-center mx-4"
+          onPress={() => setShowProfileModal(true)}
+          activeOpacity={0.7}
+        >
           <View
             className="rounded-full flex-row items-center"
             style={{
@@ -95,7 +113,7 @@ export const Header: React.FC<HeaderProps> = ({
               ▼
             </Text>
           </View>
-        </View>
+        </TouchableOpacity>
 
         {/* Right: Cart icon with badge */}
         <TouchableOpacity
@@ -130,26 +148,14 @@ export const Header: React.FC<HeaderProps> = ({
         </TouchableOpacity>
       </View>
 
-      {/* Logout Button */}
+      {/* User Profile Modal */}
       {onLogout && (
-        <View style={{ paddingHorizontal: spacing.lg, marginTop: spacing.xs }}>
-          <TouchableOpacity
-            className="self-end rounded-full"
-            style={{
-              paddingHorizontal: spacing.md,
-              paddingVertical: spacing.xs,
-              backgroundColor: theme.accentRed,
-            }}
-            onPress={onLogout}
-          >
-            <Text
-              className="text-white font-poppins-medium"
-              style={{ fontSize: fontSizes.caption }}
-            >
-              Logout
-            </Text>
-          </TouchableOpacity>
-        </View>
+        <UserProfileModal
+          visible={showProfileModal}
+          onClose={() => setShowProfileModal(false)}
+          user={user}
+          onLogout={onLogout}
+        />
       )}
     </>
   );

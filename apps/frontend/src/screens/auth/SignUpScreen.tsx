@@ -10,6 +10,8 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '../../theme/ThemeContext';
 import { useToast } from '../../context/ToastContext';
+import { useSignUp } from '@clerk/clerk-expo';
+import { useClerkFirebaseSync } from '../../hooks/useClerkFirebaseSync';
 
 interface SignUpScreenProps {
   onSignUpSuccess: () => void;
@@ -24,11 +26,15 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({
 }) => {
   const { theme } = useTheme();
   const { showToast } = useToast();
+  const { signUp, setActive, isLoaded } = useSignUp();
+  const { syncToFirebase } = useClerkFirebaseSync();
+  
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [fullName, setFullName] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [pendingVerification, setPendingVerification] = useState(false);
+  const [code, setCode] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
@@ -43,56 +49,151 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({
       return;
     }
 
-    if (password.length < 6) {
-      showToast('Password must be at least 6 characters', { type: 'error' });
+    if (password.length < 8) {
+      showToast('Password must be at least 8 characters', { type: 'error' });
       return;
     }
 
+    if (!isLoaded) return;
+
     setLoading(true);
     try {
-      const { createUserWithEmailAndPassword, sendEmailVerification, updateProfile } =
-        await import('firebase/auth');
-      const { auth } = await import('../../services/firebase');
-
-      // Create user
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-
-      // Update profile with display name (using email as name for now)
-      await updateProfile(userCredential.user, {
-        displayName: email.split('@')[0],
+      await signUp.create({
+        emailAddress: email.trim(),
+        password,
       });
 
       // Send verification email
-      try {
-        await sendEmailVerification(userCredential.user);
-      } catch (emailError: any) {
-        console.error('⚠️ Failed to send verification email:', emailError);
-        // Continue anyway - user can request it later
-      }
-
-      // Sign out the user so they must verify before accessing the app
-      await auth.signOut();
-
-      showToast(
-        `Account created for ${email}. Check your email to verify before signing in.`,
-        { type: 'success', duration: 3500 }
-      );
-      onSignUpSuccess();
+      await signUp.prepareEmailAddressVerification({ strategy: 'email_code' });
+      
+      setPendingVerification(true);
+      showToast('Verification code sent to your email', { type: 'success' });
     } catch (error: any) {
       console.error('Sign up error:', error);
       let errorMessage = 'Failed to create account';
-      if (error.code === 'auth/email-already-in-use') {
-        errorMessage = 'Email is already in use';
-      } else if (error.code === 'auth/weak-password') {
-        errorMessage = 'Password is too weak';
-      } else if (error.code === 'auth/invalid-email') {
-        errorMessage = 'Invalid email address';
+      
+      if (error.errors && error.errors[0]) {
+        errorMessage = error.errors[0].message;
+      } else if (error.message) {
+        errorMessage = error.message;
       }
+      
       showToast(errorMessage, { type: 'error' });
     } finally {
       setLoading(false);
     }
   };
+
+  const handleVerifyEmail = async () => {
+    if (!code) {
+      showToast('Please enter the verification code', { type: 'error' });
+      return;
+    }
+
+    if (!isLoaded) return;
+
+    setLoading(true);
+    try {
+      const result = await signUp.attemptEmailAddressVerification({
+        code,
+      });
+
+      if (result.status === 'complete') {
+        await setActive({ session: result.createdSessionId });
+        await syncToFirebase();
+        showToast('Account created successfully!', { type: 'success' });
+        onSignUpSuccess();
+      } else {
+        showToast('Verification incomplete. Please try again.', { type: 'error' });
+      }
+    } catch (error: any) {
+      console.error('Verification error:', error);
+      let errorMessage = 'Invalid verification code';
+      
+      if (error.errors && error.errors[0]) {
+        errorMessage = error.errors[0].message;
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
+      showToast(errorMessage, { type: 'error' });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (pendingVerification) {
+    return (
+      <SafeAreaView className="flex-1" style={{ backgroundColor: theme.background }}>
+        <ScrollView contentContainerStyle={{ flexGrow: 1 }} className="px-6">
+          <TouchableOpacity
+            className="w-10 h-10 rounded-full items-center justify-center mt-4"
+            style={{ backgroundColor: theme.backgroundCard }}
+            onPress={() => setPendingVerification(false)}
+          >
+            <Text className="text-xl" style={{ color: theme.text }}>
+              ←
+            </Text>
+          </TouchableOpacity>
+
+          <View className="flex-1 justify-center py-8">
+            <Text
+              className="text-3xl font-poppins-bold mb-2"
+              style={{ color: theme.heading }}
+            >
+              Verify Email
+            </Text>
+            <Text
+              className="text-base font-inter mb-8"
+              style={{ color: theme.textSecondary }}
+            >
+              Enter the verification code sent to {email}
+            </Text>
+
+            <View className="mb-6">
+              <Text
+                className="text-sm font-poppins-medium mb-2"
+                style={{ color: theme.text }}
+              >
+                Verification Code
+              </Text>
+              <TextInput
+                className="w-full px-4 py-4 rounded-xl font-inter"
+                style={{
+                  backgroundColor: theme.backgroundCard,
+                  color: theme.text,
+                  borderWidth: 1,
+                  borderColor: theme.border,
+                }}
+                placeholder="Enter 6-digit code"
+                placeholderTextColor={theme.textSecondary}
+                value={code}
+                onChangeText={setCode}
+                keyboardType="number-pad"
+                maxLength={6}
+                editable={!loading}
+              />
+            </View>
+
+            <TouchableOpacity
+              className="w-full py-4 rounded-full items-center justify-center"
+              style={{ backgroundColor: theme.primary }}
+              onPress={handleVerifyEmail}
+              disabled={loading}
+            >
+              {loading ? (
+                <ActivityIndicator color="#FFFFFF" />
+              ) : (
+                <Text className="text-base font-poppins-semibold text-white">
+                  Verify Email
+                </Text>
+              )}
+            </TouchableOpacity>
+          </View>
+        </ScrollView>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView className="flex-1" style={{ backgroundColor: theme.background }}>
@@ -111,25 +212,36 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({
         <View className="flex-1 justify-center py-8">
           {/* Welcome Text */}
           <Text
-            className="text-3xl font-poppins-bold mb-8"
+            className="text-3xl font-poppins-bold mb-2"
             style={{ color: theme.heading }}
           >
-            Create Your Account ✨
+            Create Account
+          </Text>
+          <Text
+            className="text-base font-inter mb-8"
+            style={{ color: theme.textSecondary }}
+          >
+            Sign up to get started
           </Text>
 
           {/* Email Input */}
-          <View
-            className="w-full mb-4 flex-row items-center px-4 py-4 rounded-2xl"
-            style={{
-              backgroundColor: theme.backgroundCard,
-            }}
-          >
-            <Text className="text-xl mr-3">✉️</Text>
-            <TextInput
-              className="flex-1 font-inter text-base"
+          <View className="mb-4">
+            <Text
+              className="text-sm font-poppins-medium mb-2"
               style={{ color: theme.text }}
-              placeholder="Email"
-              placeholderTextColor={theme.textLight}
+            >
+              Email
+            </Text>
+            <TextInput
+              className="w-full px-4 py-4 rounded-xl font-inter"
+              style={{
+                backgroundColor: theme.backgroundCard,
+                color: theme.text,
+                borderWidth: 1,
+                borderColor: theme.border,
+              }}
+              placeholder="Enter your email"
+              placeholderTextColor={theme.textSecondary}
               value={email}
               onChangeText={setEmail}
               keyboardType="email-address"
@@ -139,89 +251,102 @@ export const SignUpScreen: React.FC<SignUpScreenProps> = ({
           </View>
 
           {/* Password Input */}
-          <View
-            className="w-full mb-4 flex-row items-center px-4 py-4 rounded-2xl"
-            style={{
-              backgroundColor: theme.backgroundCard,
-            }}
-          >
-            <Text className="text-xl mr-3">🔒</Text>
-            <TextInput
-              className="flex-1 font-inter text-base"
+          <View className="mb-4">
+            <Text
+              className="text-sm font-poppins-medium mb-2"
               style={{ color: theme.text }}
-              placeholder="Password"
-              placeholderTextColor={theme.textLight}
-              value={password}
-              onChangeText={setPassword}
-              secureTextEntry={!showPassword}
-              editable={!loading}
-            />
-            <TouchableOpacity
-              onPress={() => setShowPassword(!showPassword)}
-              className="ml-2"
             >
-              <Text className="text-lg">{showPassword ? '👁️' : '👁️‍🗨️'}</Text>
-            </TouchableOpacity>
+              Password
+            </Text>
+            <View className="relative">
+              <TextInput
+                className="w-full px-4 py-4 rounded-xl font-inter"
+                style={{
+                  backgroundColor: theme.backgroundCard,
+                  color: theme.text,
+                  borderWidth: 1,
+                  borderColor: theme.border,
+                }}
+                placeholder="Enter your password"
+                placeholderTextColor={theme.textSecondary}
+                value={password}
+                onChangeText={setPassword}
+                secureTextEntry={!showPassword}
+                editable={!loading}
+              />
+              <TouchableOpacity
+                className="absolute right-4 top-4"
+                onPress={() => setShowPassword(!showPassword)}
+              >
+                <Text style={{ color: theme.textSecondary }}>
+                  {showPassword ? '👁️' : '👁️‍🗨️'}
+                </Text>
+              </TouchableOpacity>
+            </View>
           </View>
 
           {/* Confirm Password Input */}
-          <View
-            className="w-full mb-6 flex-row items-center px-4 py-4 rounded-2xl"
-            style={{
-              backgroundColor: theme.backgroundCard,
-            }}
-          >
-            <Text className="text-xl mr-3">🔒</Text>
-            <TextInput
-              className="flex-1 font-inter text-base"
+          <View className="mb-6">
+            <Text
+              className="text-sm font-poppins-medium mb-2"
               style={{ color: theme.text }}
-              placeholder="Confirm Password"
-              placeholderTextColor={theme.textLight}
-              value={confirmPassword}
-              onChangeText={setConfirmPassword}
-              secureTextEntry={!showConfirmPassword}
-              editable={!loading}
-            />
-            <TouchableOpacity
-              onPress={() => setShowConfirmPassword(!showConfirmPassword)}
-              className="ml-2"
             >
-              <Text className="text-lg">{showConfirmPassword ? '👁️' : '👁️‍🗨️'}</Text>
-            </TouchableOpacity>
+              Confirm Password
+            </Text>
+            <View className="relative">
+              <TextInput
+                className="w-full px-4 py-4 rounded-xl font-inter"
+                style={{
+                  backgroundColor: theme.backgroundCard,
+                  color: theme.text,
+                  borderWidth: 1,
+                  borderColor: theme.border,
+                }}
+                placeholder="Confirm your password"
+                placeholderTextColor={theme.textSecondary}
+                value={confirmPassword}
+                onChangeText={setConfirmPassword}
+                secureTextEntry={!showConfirmPassword}
+                editable={!loading}
+              />
+              <TouchableOpacity
+                className="absolute right-4 top-4"
+                onPress={() => setShowConfirmPassword(!showConfirmPassword)}
+              >
+                <Text style={{ color: theme.textSecondary }}>
+                  {showConfirmPassword ? '👁️' : '👁️‍🗨️'}
+                </Text>
+              </TouchableOpacity>
+            </View>
           </View>
 
           {/* Sign Up Button */}
           <TouchableOpacity
-            className="w-full py-4 rounded-full mb-6"
-            style={{
-              backgroundColor:
-                email && password && confirmPassword
-                  ? theme.primary
-                  : theme.backgroundCard,
-            }}
+            className="w-full py-4 rounded-full items-center justify-center mb-4"
+            style={{ backgroundColor: theme.primary }}
             onPress={handleEmailSignUp}
-            disabled={loading || !email || !password || !confirmPassword}
+            disabled={loading}
           >
             {loading ? (
-              <ActivityIndicator color="white" />
+              <ActivityIndicator color="#FFFFFF" />
             ) : (
-              <Text className="text-white text-center text-base font-poppins-semibold">
-                Sign up
+              <Text className="text-base font-poppins-semibold text-white">
+                Sign Up
               </Text>
             )}
           </TouchableOpacity>
 
           {/* Sign In Link */}
-          <View className="flex-row items-center justify-center">
+          <View className="flex-row items-center justify-center mt-4">
             <Text className="text-base font-inter" style={{ color: theme.textSecondary }}>
-              Already Have an Account?{' '}
+              Already have an account?{' '}
             </Text>
-            <TouchableOpacity onPress={onSwitchToSignIn} disabled={loading}>
+            <TouchableOpacity onPress={onSwitchToSignIn}>
               <Text
                 className="text-base font-poppins-semibold"
                 style={{ color: theme.primary }}
               >
-                Sign in
+                Sign In
               </Text>
             </TouchableOpacity>
           </View>

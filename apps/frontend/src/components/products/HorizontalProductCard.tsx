@@ -4,6 +4,7 @@ import { Image } from 'expo-image';
 import { useTheme } from '../../theme/ThemeContext';
 import { Product, getProductImageSource } from '../../services/productService';
 import { HeartIcon, AddIcon } from '../common/Icon';
+import { typography } from '../../theme/typography';
 
 interface HorizontalProductCardProps {
   product: Product;
@@ -56,8 +57,7 @@ export const HorizontalProductCard: React.FC<HorizontalProductCardProps> = ({
         {/* Top Row: Name and Heart */}
         <View className="flex-row justify-between items-start">
           <Text
-            className="flex-1 text-lg font-poppins-semibold"
-            style={{ color: theme.heading }}
+            style={[typography.h4, { flex: 1, color: theme.text }]}
             numberOfLines={2}
           >
             {product.name}
@@ -85,20 +85,17 @@ export const HorizontalProductCard: React.FC<HorizontalProductCardProps> = ({
         <View className="flex-row justify-between items-end">
           {/* Price */}
           <View className="flex-row items-baseline">
-            <Text className="text-2xl font-poppins-bold" style={{ color: theme.primary }}>
+            <Text style={typography.price}>
               $ {product.price.toFixed(1)}
             </Text>
-            <Text
-              className="ml-1 text-sm font-inter"
-              style={{ color: theme.textSecondary }}
-            >
+            <Text style={[typography.priceUnit, { marginLeft: 4, color: theme.textSecondary }]}>
               /kg
             </Text>
           </View>
 
           {/* Add to Cart / Out of Stock */}
           {product.stock === 0 ? (
-            <Text className="text-xs font-inter" style={{ color: theme.textSecondary }}>
+            <Text style={[typography.caption, { color: theme.textSecondary }]}>
               Out of stock
             </Text>
           ) : (

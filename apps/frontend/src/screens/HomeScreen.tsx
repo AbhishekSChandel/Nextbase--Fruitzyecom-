@@ -20,6 +20,8 @@ import { db } from '../services/firebase';
 import { collection, getDocs, updateDoc, doc } from 'firebase/firestore';
 import { RootStackParamList } from '../navigation/types';
 import { getFontSizes, getSpacing } from '../utils/responsive';
+import { typography } from '../theme/typography';
+import { addMissingProducts } from '../services/addMissingProducts';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Home'>;
 
@@ -49,16 +51,31 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
   const [resetting, setResetting] = useState(false);
 
   const getInitial = () => {
-    const name = user?.displayName || user?.email || 'U';
+    // Try to get name from Clerk user object
+    const firstName = user?.firstName;
+    const lastName = user?.lastName;
+    const fullName = user?.fullName;
+    const email = user?.primaryEmailAddress?.emailAddress || user?.email;
+    
+    // Priority: firstName > lastName > fullName > email
+    const name = firstName || lastName || fullName || email || 'U';
     return name.charAt(0).toUpperCase();
   };
 
-  // Priority products to show first (in order)
-  const PRIORITY_PRODUCTS = ['mango', 'strawberry', 'blueberries'];
-  const INITIAL_LOAD_COUNT = 3;
-  const LOAD_MORE_COUNT = 3;
+  // Priority products with high-quality images from "good imgs" folder
+  // These will be shown first on the home screen
+  const PRIORITY_PRODUCTS_WITH_GOOD_IMGS = ['mango', 'strawberry', 'bread', 'chicken', 'avocado-premium'];
+  
+  // Initial load: Show all products with good images first
+  const INITIAL_LOAD_COUNT = PRIORITY_PRODUCTS_WITH_GOOD_IMGS.length;
+  const LOAD_MORE_COUNT = 5; // Load 5 more products when scrolling
 
   useEffect(() => {
+    // Automatically add missing products (bread, chicken, avocado-premium) if they don't exist
+    addMissingProducts().catch((err) => {
+      console.error('Error adding missing products:', err);
+    });
+    
     loadProducts();
   }, []);
 
@@ -68,11 +85,11 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
       setError(null);
       const fetchedProducts = await fetchProducts();
 
-      // Sort products: priority items first, then others
+      // Sort products: products with good images first, then others
       const sortedProducts = sortProductsByPriority(fetchedProducts);
       setAllProducts(sortedProducts);
 
-      // Initially show only first 3 (priority products)
+      // Initially show only products with high-quality images from "good imgs" folder
       setDisplayedProducts(sortedProducts.slice(0, INITIAL_LOAD_COUNT));
     } catch (err) {
       console.error('Error loading products:', err);
@@ -86,8 +103,8 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
     const priorityProducts: Product[] = [];
     const otherProducts: Product[] = [];
 
-    // First, add priority products in order
-    PRIORITY_PRODUCTS.forEach((priorityId) => {
+    // First, add products with high-quality images in order
+    PRIORITY_PRODUCTS_WITH_GOOD_IMGS.forEach((priorityId) => {
       const product = products.find((p) => p.id === priorityId);
       if (product) {
         priorityProducts.push(product);
@@ -96,7 +113,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
 
     // Then add remaining products
     products.forEach((product) => {
-      if (!PRIORITY_PRODUCTS.includes(product.id)) {
+      if (!PRIORITY_PRODUCTS_WITH_GOOD_IMGS.includes(product.id)) {
         otherProducts.push(product);
       }
     });
@@ -220,24 +237,10 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
 
           {/* Greeting - Matching Figma */}
           <View style={{ paddingHorizontal: spacing.lg, marginTop: spacing.sm }}>
-            <Text
-              className="font-poppins-bold"
-              style={{
-                fontSize: fontSizes.h1,
-                color: theme.heading,
-                lineHeight: fontSizes.h1 * 1.2,
-              }}
-            >
+            <Text style={[typography.h1, { color: theme.heading }]}>
               Hey {isGuestMode ? 'Guest' : getInitial()} 👋
             </Text>
-            <Text
-              className="font-inter"
-              style={{
-                fontSize: fontSizes.body,
-                color: theme.textSecondary,
-                marginTop: spacing.xs,
-              }}
-            >
+            <Text style={[typography.bodySecondary, { marginTop: spacing.xs, color: theme.textSecondary }]}>
               Find fresh groceries you want
             </Text>
           </View>
@@ -253,14 +256,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
 
           {/* Products Section - Matching Figma */}
           <View style={{ paddingHorizontal: spacing.lg, marginTop: spacing.md }}>
-            <Text
-              className="font-poppins-bold"
-              style={{
-                fontSize: fontSizes.h2,
-                color: theme.heading,
-                marginBottom: spacing.md,
-              }}
-            >
+            <Text style={[typography.h2, { marginBottom: spacing.md, color: theme.heading }]}>
               Popular
             </Text>
 

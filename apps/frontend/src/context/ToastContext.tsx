@@ -76,7 +76,7 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       ? theme.primary
       : type === 'error'
         ? theme.accentRed
-        : 'rgba(0, 0, 0, 0.85)';
+        : 'rgba(0, 0, 0, 0.7)'; // More subtle/transparent for neutral
 
   return (
     <ToastContext.Provider value={{ showToast }}>
@@ -96,16 +96,21 @@ const styles = StyleSheet.create({
     position: 'absolute',
     left: 24,
     right: 24,
-    bottom: 40,
-    borderRadius: 16,
-    paddingVertical: 14,
-    paddingHorizontal: 18,
+    top: 150, // Moved to top, below status bar
+    borderRadius: 12, // Smaller border radius
+    paddingVertical: 10, // Smaller padding
+    paddingHorizontal: 16, // Smaller padding
     alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
   toastText: {
     color: '#FFFFFF',
-    fontFamily: 'Poppins_500Medium',
-    fontSize: 14,
+    fontFamily: 'Inter_400Regular', // Lighter font weight
+    fontSize: 13, // Smaller font size
     textAlign: 'center',
   },
 });

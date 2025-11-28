@@ -10,9 +10,15 @@
  */
 
 export const ProductImages = {
-  mango: require('../../assets/products/mango.png'),
+  // High-quality images from "good imgs" folder
+  mango: require('../../assets/products/good imgs/mango.png'),
+  strawberry: require('../../assets/products/good imgs/strawberry.png'),
+  bread: require('../../assets/products/good imgs/bread.png'),
+  chicken: require('../../assets/products/good imgs/chicken.png'),
+  avocadoPremium: require('../../assets/products/good imgs/avocado-premium.png'),
+  
+  // Other product images (regular quality)
   avocado: require('../../assets/products/avocado.png'),
-  strawberry: require('../../assets/products/strawberry.png'),
   grapes: require('../../assets/products/grapes.png'),
   orange: require('../../assets/products/orange.png'),
   banana: require('../../assets/products/banana.png'),
@@ -20,15 +26,12 @@ export const ProductImages = {
   pomegranate: require('../../assets/products/pomegranate.png'),
   fig: require('../../assets/products/fig.png'),
   durian: require('../../assets/products/durian.png'),
-  bread: require('../../assets/products/bread.png'),
-  chicken: require('../../assets/products/chicken.png'),
-  avocadoPremium: require('../../assets/products/avocado-premium.png'),
 };
 
 export const BannerImages = {
-  banner40: require('../../assets/banners/banner-40.png'),
-  banner30: require('../../assets/banners/banner-30.png'),
-  banner20: require('../../assets/banners/banner-20.png'),
+  banner40: require('../../assets/banners/Banner 40%.png'),
+  banner30: require('../../assets/banners/Banner 30%.png'),
+  banner20: require('../../assets/banners/Banner 20%.png'),
 };
 
 /**

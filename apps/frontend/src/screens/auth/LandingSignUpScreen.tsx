@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
   View,
   Text,
@@ -6,12 +6,14 @@ import {
   ScrollView,
   ActivityIndicator,
   ViewStyle,
+  Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '../../theme/ThemeContext';
-import { signInWithGoogle } from '../../services/googleAuth';
 import { useToast } from '../../context/ToastContext';
-import { FontAwesome } from '@expo/vector-icons';
+import { MaterialCommunityIcons, FontAwesome } from '@expo/vector-icons';
+import { useOAuth } from '@clerk/clerk-expo';
+import { useClerkFirebaseSync } from '../../hooks/useClerkFirebaseSync';
 
 interface LandingSignUpScreenProps {
   onEmailSignUp: () => void;
@@ -23,8 +25,11 @@ export const LandingSignUpScreen: React.FC<LandingSignUpScreenProps> = ({
   onSwitchToSignIn,
 }) => {
   const { theme } = useTheme();
-  const [loading, setLoading] = useState(false);
   const { showToast } = useToast();
+  const { syncToFirebase } = useClerkFirebaseSync();
+  
+  const { startOAuthFlow: startGoogleOAuth } = useOAuth({ strategy: 'oauth_google' });
+  const { startOAuthFlow: startAppleOAuth } = useOAuth({ strategy: 'oauth_apple' });
 
   const SocialButton = ({
     label,
@@ -39,7 +44,7 @@ export const LandingSignUpScreen: React.FC<LandingSignUpScreenProps> = ({
     style,
   }: {
     label: string;
-    icon: string;
+    icon: any;
     backgroundColor: string;
     textColor: string;
     iconColor?: string;
@@ -62,16 +67,16 @@ export const LandingSignUpScreen: React.FC<LandingSignUpScreenProps> = ({
       disabled={disabled}
       activeOpacity={0.8}
     >
-      <View style={{ width: 24, alignItems: 'center' }}>
+      <View style={{ width: 24, alignItems: 'center', marginRight: 12 }}>
         {isLoading ? (
           <ActivityIndicator size="small" color={textColor} />
         ) : (
-          <FontAwesome name={icon as any} size={20} color={iconColor ?? textColor} />
+          icon
         )}
       </View>
       <Text
         className="font-poppins-medium"
-        style={{ color: textColor, fontSize: 16, marginLeft: 12 }}
+        style={{ color: textColor, fontSize: 16 }}
       >
         {label}
       </Text>
@@ -79,23 +84,37 @@ export const LandingSignUpScreen: React.FC<LandingSignUpScreenProps> = ({
   );
 
   const handleGoogleSignUp = async () => {
-    setLoading(true);
-    const result = await signInWithGoogle();
-    setLoading(false);
-
-    if (!result.success && result.error) {
-      showToast(result.error, { type: 'error' });
-    } else if (result.success) {
-      showToast('Signed up with Google', { type: 'success' });
+    try {
+      const { createdSessionId, setActive } = await startGoogleOAuth();
+      
+      if (createdSessionId) {
+        await setActive!({ session: createdSessionId });
+        await syncToFirebase();
+        showToast('Signed up with Google', { type: 'success' });
+      }
+    } catch (error: any) {
+      console.error('Google sign-up error:', error);
+      showToast(error.message || 'Failed to sign up with Google', { type: 'error' });
     }
   };
 
-  const handleFacebookSignUp = () => {
-    showToast('Facebook signup is a demo only for now', { type: 'neutral' });
-  };
-
-  const handleAppleSignUp = () => {
-    showToast('Apple signup is a demo only for now', { type: 'neutral' });
+  const handleAppleSignUp = async () => {
+    if (Platform.OS === 'ios') {
+      try {
+        const { createdSessionId, setActive } = await startAppleOAuth();
+        
+        if (createdSessionId) {
+          await setActive!({ session: createdSessionId });
+          await syncToFirebase();
+          showToast('Signed up with Apple', { type: 'success' });
+        }
+      } catch (error: any) {
+        console.error('Apple sign-up error:', error);
+        showToast(error.message || 'Failed to sign up with Apple', { type: 'error' });
+      }
+    } else {
+      showToast('Apple signup is only available on iOS', { type: 'neutral' });
+    }
   };
 
   return (
@@ -116,35 +135,33 @@ export const LandingSignUpScreen: React.FC<LandingSignUpScreenProps> = ({
           {/* Email Button */}
           <SocialButton
             label="Continue with Email"
-            icon="envelope-o"
-            backgroundColor={theme.backgroundCard}
-            textColor={theme.text}
+            icon={<MaterialCommunityIcons name="email-outline" size={20} color="#666" />}
+            backgroundColor="#F3F4F6"
+            textColor="#1F2937"
             onPress={onEmailSignUp}
           />
 
-          <SocialButton
-            label="Continue with Facebook"
-            icon="facebook"
-            backgroundColor="#1877F2"
-            textColor="#FFFFFF"
-            onPress={handleFacebookSignUp}
-          />
-
+          {/* Google Button */}
           <SocialButton
             label="Continue with Google"
-            icon="google"
-            backgroundColor="#FFFFFF"
-            textColor={theme.text}
-            iconColor="#DB4437"
-            borderColor={theme.border}
+            icon={<FontAwesome name="google" size={20} color="#DB4437" />}
+            backgroundColor="#F3F4F6"
+            textColor="#1F2937"
             onPress={handleGoogleSignUp}
-            disabled={loading}
-            isLoading={loading}
           />
 
+          {/* Or Separator */}
+          <Text
+            className="text-center font-inter my-2"
+            style={{ color: theme.textSecondary, fontSize: 14 }}
+          >
+            or
+          </Text>
+
+          {/* Apple Button */}
           <SocialButton
             label="Continue with Apple"
-            icon="apple"
+            icon={<MaterialCommunityIcons name="apple" size={20} color="#FFFFFF" />}
             backgroundColor="#000000"
             textColor="#FFFFFF"
             onPress={handleAppleSignUp}
@@ -159,7 +176,7 @@ export const LandingSignUpScreen: React.FC<LandingSignUpScreenProps> = ({
             <TouchableOpacity onPress={onSwitchToSignIn}>
               <Text
                 className="text-base font-poppins-semibold"
-                style={{ color: theme.primary }}
+                style={{ color: '#2ECC71' }}
               >
                 Sign in
               </Text>

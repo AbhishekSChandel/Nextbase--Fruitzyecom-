@@ -18,13 +18,14 @@ import {
 } from '../components/common/Icon';
 import { getFontSizes } from '../utils/responsive';
 import { useToast } from '../context/ToastContext';
+import { typography } from '../theme/typography';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'ProductDetail'>;
 
 export const ProductDetailScreen: React.FC<Props> = ({ route, navigation }) => {
   const { product } = route.params;
   const { theme } = useTheme();
-  const { addToCart, getCartItem } = useCart();
+  const { addToCart, getCartItem, cartCount } = useCart();
   const { showToast } = useToast();
   const fontSizes = getFontSizes();
   const [quantity, setQuantity] = useState(1);
@@ -77,13 +78,32 @@ export const ProductDetailScreen: React.FC<Props> = ({ route, navigation }) => {
               <BackIcon size={24} color={theme.text} />
             </TouchableOpacity>
 
-            {/* Cart Icon */}
+            {/* Cart Icon with Badge */}
             <TouchableOpacity
-              className="w-16 h-16 rounded-2xl items-center justify-center"
+              className="w-16 h-16 rounded-2xl items-center justify-center relative"
               style={{ backgroundColor: theme.backgroundCard }}
               onPress={() => navigation.navigate('Cart')}
             >
               <CartIcon size={26} color={theme.textSecondary} />
+              {cartCount > 0 && (
+                <View
+                  className="absolute rounded-full items-center justify-center"
+                  style={{
+                    top: 8,
+                    right: 8,
+                    width: 20,
+                    height: 20,
+                    backgroundColor: theme.accentRed,
+                  }}
+                >
+                  <Text
+                    className="text-white font-poppins-bold"
+                    style={{ fontSize: fontSizes.caption }}
+                  >
+                    {cartCount > 9 ? '9+' : cartCount}
+                  </Text>
+                </View>
+              )}
             </TouchableOpacity>
           </View>
 
@@ -168,16 +188,10 @@ export const ProductDetailScreen: React.FC<Props> = ({ route, navigation }) => {
               {/* Price */}
               <View className="flex-1 items-end">
                 <View className="flex-row items-baseline">
-                  <Text
-                    className="font-poppins-bold"
-                    style={{ color: theme.primary, fontSize: fontSizes.price }}
-                  >
+                  <Text style={typography.price}>
                     $ {product.price.toFixed(1)}
                   </Text>
-                  <Text
-                    className="font-inter ml-1"
-                    style={{ color: theme.textSecondary, fontSize: fontSizes.bodySmall }}
-                  >
+                  <Text style={[typography.priceUnit, { marginLeft: 4, color: theme.textSecondary }]}>
                     /kg
                   </Text>
                 </View>
@@ -185,26 +199,17 @@ export const ProductDetailScreen: React.FC<Props> = ({ route, navigation }) => {
             </View>
 
             {/* Description */}
-            <Text
-              className="font-poppins-bold mb-3"
-              style={{ color: theme.heading, fontSize: fontSizes.h3 }}
-            >
+            <Text style={[typography.h3, { marginBottom: 12, color: theme.text }]}>
               Description
             </Text>
-            <Text
-              className="font-inter leading-6 mb-6"
-              style={{ color: theme.textSecondary, fontSize: fontSizes.body }}
-            >
+            <Text style={[typography.bodySecondary, { marginBottom: 24, lineHeight: 24, color: theme.textSecondary }]}>
               {product.description}
             </Text>
 
             {/* Stock Info */}
             {product.stock < 10 && (
               <View className="mb-4">
-                <Text
-                  className="text-sm font-inter"
-                  style={{ color: theme.accentOrange }}
-                >
+                <Text style={[typography.bodySmall, { color: theme.accentOrange }]}>
                   ⚠️ Only {product.stock} left in stock!
                 </Text>
               </View>

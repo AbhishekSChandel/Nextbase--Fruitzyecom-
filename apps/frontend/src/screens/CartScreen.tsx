@@ -10,6 +10,7 @@ import { RootStackParamList } from '../navigation/types';
 import { BackIcon, HeartIcon, MinusIcon, AddIcon, Icon } from '../components/common/Icon';
 import { getFontSizes } from '../utils/responsive';
 import { useToast } from '../context/ToastContext';
+import { typography } from '../theme/typography';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Cart'>;
 
@@ -54,7 +55,7 @@ export const CartScreen: React.FC<Props> = ({ navigation }) => {
       <View className="flex-1" style={{ backgroundColor: theme.background }}>
         <SafeAreaView className="flex-1">
           {/* Header */}
-          <View className="px-6 pt-4 mb-6">
+          <View className="px-6 mt-2 mb-6">
             <TouchableOpacity
               className="justify-center items-center mb-6 w-16 h-16 rounded-full"
               style={{ backgroundColor: theme.backgroundCard }}

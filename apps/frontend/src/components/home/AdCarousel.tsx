@@ -10,15 +10,17 @@ import { Image as ExpoImage } from 'expo-image';
 import { useTheme } from '../../theme/ThemeContext';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
-const BANNER_WIDTH = SCREEN_WIDTH - 48; // 24px padding each side
-const BANNER_HEIGHT = 140; // Smaller height matching Figma
-const BANNER_SPACING = 12; // Even spacing between banners
+// 15% smaller: Original was SCREEN_WIDTH - 48, now 85% of that
+const BANNER_WIDTH = (SCREEN_WIDTH - 48) * 0.85; // 15% smaller with uniform padding
+const BANNER_HEIGHT = 140 * 0.85; // 15% smaller height
+const BANNER_SPACING = 16; // Uniform spacing between banners
+const SIDE_PADDING = 24; // Uniform side padding
 const AUTO_SCROLL_INTERVAL = 4000; // 4 seconds
 
 const banners = [
-  require('../../../assets/banners/banner-40.png'),
-  require('../../../assets/banners/banner-30.png'),
-  require('../../../assets/banners/banner-20.png'),
+  require('../../../assets/banners/Banner 40%.png'),
+  require('../../../assets/banners/Banner 30%.png'),
+  require('../../../assets/banners/Banner 20%.png'),
 ];
 
 export const AdCarousel: React.FC = () => {
@@ -91,8 +93,8 @@ export const AdCarousel: React.FC = () => {
         snapToAlignment="center"
         decelerationRate="fast"
         contentContainerStyle={{
-          paddingHorizontal: 24,
-          paddingRight: 24 - BANNER_SPACING, // Even padding on the right
+          paddingHorizontal: SIDE_PADDING,
+          paddingRight: SIDE_PADDING, // Uniform padding on the right
         }}
         onScroll={handleScroll}
         scrollEventThrottle={16}

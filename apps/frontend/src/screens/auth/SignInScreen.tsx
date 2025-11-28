@@ -10,6 +10,8 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '../../theme/ThemeContext';
 import { useToast } from '../../context/ToastContext';
+import { useSignIn } from '@clerk/clerk-expo';
+import { useClerkFirebaseSync } from '../../hooks/useClerkFirebaseSync';
 
 interface SignInScreenProps {
   onSignInSuccess: () => void;
@@ -24,6 +26,9 @@ export const SignInScreen: React.FC<SignInScreenProps> = ({
 }) => {
   const { theme } = useTheme();
   const { showToast } = useToast();
+  const { signIn, setActive, isLoaded } = useSignIn();
+  const { syncToFirebase } = useClerkFirebaseSync();
+  
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -35,51 +40,39 @@ export const SignInScreen: React.FC<SignInScreenProps> = ({
       return;
     }
 
+    if (!isLoaded) return;
+
     setLoading(true);
 
     try {
-      // Import auth functions dynamically
-      const { signInWithEmailAndPassword } = await import('firebase/auth');
-      const { auth } = await import('../../services/firebase');
+      const result = await signIn.create({
+        identifier: email.trim(),
+        password,
+      });
 
-      const userCredential = await signInWithEmailAndPassword(
-        auth,
-        email.trim(),
-        password
-      );
-
-      // TODO: Re-enable email verification once emails are working
-      // For now, allow sign in without verification for testing
-      onSignInSuccess();
+      if (result.status === 'complete') {
+        await setActive({ session: result.createdSessionId });
+        await syncToFirebase();
+        showToast('Signed in successfully', { type: 'success' });
+        onSignInSuccess();
+      } else {
+        showToast('Sign-in incomplete. Please try again.', { type: 'error' });
+      }
     } catch (error: any) {
       console.error('❌ Sign in error:', error);
-      console.error('Error code:', error.code);
-      console.error('Error message:', error.message);
-
+      
       let errorMessage = 'Invalid email or password';
 
-      if (error.code === 'auth/invalid-credential') {
-        errorMessage = 'Invalid email or password. Please check your credentials.';
-      } else if (error.code === 'auth/user-not-found') {
-        errorMessage = 'No account found with this email. Please sign up first.';
-      } else if (error.code === 'auth/wrong-password') {
-        errorMessage = 'Incorrect password. Please try again.';
-      } else if (error.code === 'auth/too-many-requests') {
-        errorMessage = 'Too many failed attempts. Please try again later.';
+      if (error.errors && error.errors[0]) {
+        errorMessage = error.errors[0].message;
+      } else if (error.message) {
+        errorMessage = error.message;
       }
 
       showToast(errorMessage, { type: 'error' });
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleGoogleSignIn = async () => {
-    showToast('Google Sign-In will be available soon', { type: 'neutral' });
-  };
-
-  const handleAppleSignIn = async () => {
-    showToast('Apple Sign-In will be available soon', { type: 'neutral' });
   };
 
   return (
@@ -102,28 +95,33 @@ export const SignInScreen: React.FC<SignInScreenProps> = ({
             className="text-3xl font-poppins-bold mb-2"
             style={{ color: theme.heading }}
           >
-            Welcome Back! 👋
+            Welcome Back!
           </Text>
           <Text
             className="text-base font-inter mb-8"
             style={{ color: theme.textSecondary }}
           >
-            Great to see you again, You've been missed!
+            Sign in to continue
           </Text>
 
           {/* Email Input */}
-          <View
-            className="w-full mb-4 flex-row items-center px-4 py-4 rounded-2xl"
-            style={{
-              backgroundColor: theme.backgroundCard,
-            }}
-          >
-            <Text className="text-xl mr-3">✉️</Text>
-            <TextInput
-              className="flex-1 font-inter text-base"
+          <View className="mb-4">
+            <Text
+              className="text-sm font-poppins-medium mb-2"
               style={{ color: theme.text }}
-              placeholder="Email"
-              placeholderTextColor={theme.textLight}
+            >
+              Email
+            </Text>
+            <TextInput
+              className="w-full px-4 py-4 rounded-xl font-inter"
+              style={{
+                backgroundColor: theme.backgroundCard,
+                color: theme.text,
+                borderWidth: 1,
+                borderColor: theme.border,
+              }}
+              placeholder="Enter your email"
+              placeholderTextColor={theme.textSecondary}
               value={email}
               onChangeText={setEmail}
               keyboardType="email-address"
@@ -133,60 +131,67 @@ export const SignInScreen: React.FC<SignInScreenProps> = ({
           </View>
 
           {/* Password Input */}
-          <View
-            className="w-full mb-6 flex-row items-center px-4 py-4 rounded-2xl"
-            style={{
-              backgroundColor: theme.backgroundCard,
-            }}
-          >
-            <Text className="text-xl mr-3">🔒</Text>
-            <TextInput
-              className="flex-1 font-inter text-base"
+          <View className="mb-6">
+            <Text
+              className="text-sm font-poppins-medium mb-2"
               style={{ color: theme.text }}
-              placeholder="Password"
-              placeholderTextColor={theme.textLight}
-              value={password}
-              onChangeText={setPassword}
-              secureTextEntry={!showPassword}
-              editable={!loading}
-            />
-            <TouchableOpacity
-              onPress={() => setShowPassword(!showPassword)}
-              className="ml-2"
             >
-              <Text className="text-lg">{showPassword ? '👁️' : '👁️‍🗨️'}</Text>
-            </TouchableOpacity>
+              Password
+            </Text>
+            <View className="relative">
+              <TextInput
+                className="w-full px-4 py-4 rounded-xl font-inter"
+                style={{
+                  backgroundColor: theme.backgroundCard,
+                  color: theme.text,
+                  borderWidth: 1,
+                  borderColor: theme.border,
+                }}
+                placeholder="Enter your password"
+                placeholderTextColor={theme.textSecondary}
+                value={password}
+                onChangeText={setPassword}
+                secureTextEntry={!showPassword}
+                editable={!loading}
+              />
+              <TouchableOpacity
+                className="absolute right-4 top-4"
+                onPress={() => setShowPassword(!showPassword)}
+              >
+                <Text style={{ color: theme.textSecondary }}>
+                  {showPassword ? '👁️' : '👁️‍🗨️'}
+                </Text>
+              </TouchableOpacity>
+            </View>
           </View>
 
           {/* Sign In Button */}
           <TouchableOpacity
-            className="w-full py-4 rounded-full mb-6"
-            style={{
-              backgroundColor: email && password ? theme.primary : theme.backgroundCard,
-            }}
+            className="w-full py-4 rounded-full items-center justify-center mb-4"
+            style={{ backgroundColor: theme.primary }}
             onPress={handleEmailSignIn}
-            disabled={loading || !email || !password}
+            disabled={loading}
           >
             {loading ? (
-              <ActivityIndicator color="white" />
+              <ActivityIndicator color="#FFFFFF" />
             ) : (
-              <Text className="text-white text-center text-base font-poppins-semibold">
-                Sign in
+              <Text className="text-base font-poppins-semibold text-white">
+                Sign In
               </Text>
             )}
           </TouchableOpacity>
 
           {/* Sign Up Link */}
-          <View className="flex-row items-center justify-center">
+          <View className="flex-row items-center justify-center mt-4">
             <Text className="text-base font-inter" style={{ color: theme.textSecondary }}>
-              Don't Have an Account?{' '}
+              Don't have an account?{' '}
             </Text>
-            <TouchableOpacity onPress={onSwitchToSignUp} disabled={loading}>
+            <TouchableOpacity onPress={onSwitchToSignUp}>
               <Text
                 className="text-base font-poppins-semibold"
                 style={{ color: theme.primary }}
               >
-                Sign up
+                Sign Up
               </Text>
             </TouchableOpacity>
           </View>

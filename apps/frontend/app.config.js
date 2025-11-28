@@ -4,12 +4,12 @@ module.exports = {
     slug: 'fruitzy',
     version: '1.0.0',
     orientation: 'portrait',
-    icon: './assets/icon.png',
+    icon: './assets/Fruitzy app Icon.png',
     userInterfaceStyle: 'automatic',
     newArchEnabled: true,
     scheme: 'fruitzy',
     splash: {
-      image: './assets/splash-icon.png',
+      image: './assets/Fruitzy app Icon.png',
       resizeMode: 'contain',
       backgroundColor: '#ffffff',
     },
@@ -19,7 +19,7 @@ module.exports = {
     },
     android: {
       adaptiveIcon: {
-        foregroundImage: './assets/adaptive-icon.png',
+        foregroundImage: './assets/Fruitzy app Icon.png',
         backgroundColor: '#ffffff',
       },
       package: 'com.fruitzy.app',
@@ -41,6 +41,7 @@ module.exports = {
       firebaseMeasurementId: process.env.FIREBASE_MEASUREMENT_ID,
       googleWebClientId: process.env.GOOGLE_WEB_CLIENT_ID,
       googleAndroidClientId: process.env.GOOGLE_ANDROID_CLIENT_ID,
+      clerkPublishableKey: process.env.CLERK_PUBLISHABLE_KEY,
     },
   },
 };

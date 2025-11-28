@@ -15,6 +15,9 @@ import {
   Inter_600SemiBold,
 } from '@expo-google-fonts/inter';
 import { NavigationContainer } from '@react-navigation/native';
+import { ClerkProvider, useAuth, useUser } from '@clerk/clerk-expo';
+import { tokenCache } from './src/utils/clerkTokenCache';
+import Constants from 'expo-constants';
 import { ThemeProvider } from './src/theme/ThemeContext';
 import { ToastProvider } from './src/context/ToastContext';
 import { CartProvider } from './src/context/CartContext';
@@ -23,13 +26,13 @@ import { LandingSignInScreen } from './src/screens/auth/LandingSignInScreen';
 import { SignInScreen } from './src/screens/auth/SignInScreen';
 import { LandingSignUpScreen } from './src/screens/auth/LandingSignUpScreen';
 import { SignUpScreen } from './src/screens/auth/SignUpScreen';
-import { onAuthStateChanged, User } from 'firebase/auth';
 import { auth } from './src/services/firebase';
-import { Alert } from 'react-native';
 
 type AuthView = 'landing-signin' | 'email-signin' | 'landing-signup' | 'email-signup';
 
-export default function App() {
+const clerkPublishableKey = Constants.expoConfig?.extra?.clerkPublishableKey || '';
+
+function AppContent() {
   const [fontsLoaded] = useFonts({
     Poppins_400Regular,
     Poppins_500Medium,
@@ -40,21 +43,12 @@ export default function App() {
     Inter_600SemiBold,
   });
 
-  const [user, setUser] = useState<User | null>(null);
-  const [authLoading, setAuthLoading] = useState(true);
+  const { isSignedIn, isLoaded: clerkLoaded, signOut: clerkSignOut } = useAuth();
+  const { user: clerkUser } = useUser();
   const [authView, setAuthView] = useState<AuthView>('landing-signin');
   const [skipAuth, setSkipAuth] = useState(false);
 
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser);
-      setAuthLoading(false);
-    });
-
-    return () => unsubscribe();
-  }, []);
-
-  if (!fontsLoaded || authLoading) {
+  if (!fontsLoaded || !clerkLoaded) {
     return (
       <View className="flex-1 justify-center items-center bg-white">
         <ActivityIndicator size="large" color="#2ECC71" />
@@ -64,7 +58,11 @@ export default function App() {
 
   const handleSignOut = async () => {
     try {
+      // Sign out from Clerk
+      await clerkSignOut();
+      // Sign out from Firebase
       await auth.signOut();
+      // Reset local state
       setSkipAuth(false);
       setAuthView('landing-signin');
     } catch (error) {
@@ -86,7 +84,7 @@ export default function App() {
         return (
           <SignInScreen
             onSignInSuccess={() => {
-              /* Auth state will update automatically */
+              /* Clerk auth state will update automatically */
             }}
             onSwitchToSignUp={() => setAuthView('landing-signup')}
             onBack={() => setAuthView('landing-signin')}
@@ -114,12 +112,12 @@ export default function App() {
     <ThemeProvider>
       <ToastProvider>
         <CartProvider>
-          {user || skipAuth ? (
+          {isSignedIn || skipAuth ? (
             <NavigationContainer>
               <AppNavigator
-                user={user}
+                user={clerkUser}
                 onSignOut={handleSignOut}
-                isGuestMode={skipAuth && !user}
+                isGuestMode={skipAuth && !isSignedIn}
               />
             </NavigationContainer>
           ) : (
@@ -129,5 +127,13 @@ export default function App() {
         </CartProvider>
       </ToastProvider>
     </ThemeProvider>
+  );
+}
+
+export default function App() {
+  return (
+    <ClerkProvider publishableKey={clerkPublishableKey} tokenCache={tokenCache}>
+      <AppContent />
+    </ClerkProvider>
   );
 }

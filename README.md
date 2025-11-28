@@ -14,12 +14,29 @@ We follow **Rule 1**: build and verify one component/feature at a time.
 
 # Features
 
-- Home screen with priority products, search bar, and ad carousel
-- Small “refresh” button under Popular to reset stock to original
-- Out‑of‑stock UX: disabled add, slight gray, tiny label under name
-- Cart with quantity controls, remove items, total, and checkout navigation
-- Authentication with email/password and Google sign‑in; guest greeting
--
+✨ **Shopping Experience**
+- 🏠 **Smart Home Screen** - Priority products with high-quality images, intelligent lazy loading, and smooth ad carousel
+- 🔍 **Powerful Search** - Real-time product search with filter options and recent search history
+- 🛒 **Smart Cart** - Quantity controls, item management, and seamless checkout flow
+- 📦 **Product Details** - Rich product pages with descriptions, stock alerts, and favorite functionality
+
+🎨 **User Experience**
+- 🌓 **Dark/Light Mode** - Beautiful theme switching with consistent typography and colors
+- 👤 **User Profile** - Quick access menu with user info, theme toggle, and logout
+- 🎯 **Guest Mode** - Continue shopping without login, full app access for everyone
+- ⚡ **Performance** - Optimized images, lazy loading, and smooth animations
+
+🔐 **Authentication**
+- 📧 **Email/Password** - Secure email authentication with Clerk integration
+- 🔵 **Google Sign-In** - One-tap Google authentication (fully functional)
+- 🍎 **Apple Sign-In** - Ready for Apple authentication (dummy implementation)
+- 🚪 **Smart Logout** - Easy logout from profile menu with session management
+
+📱 **UI/UX Highlights**
+- 🎨 **Figma-Accurate Design** - Pixel-perfect implementation matching design specifications
+- 📐 **Responsive Layout** - Optimized for all screen sizes and devices
+- 🎭 **Toast Notifications** - Subtle, non-intrusive feedback messages
+- 🏷️ **Stock Management** - Real-time inventory tracking with out-of-stock indicators
 
 ## Structure
 
