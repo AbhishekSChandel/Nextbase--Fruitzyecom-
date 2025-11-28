@@ -148,3 +148,7 @@ To build an APK for review or distribution:
 - Expo + NativeWind bootstrap with theme toggle.
 - Firebase Functions scaffold with Firestore seed utilities referencing `firebasedata.md`.
 - Shared config package for consistent Firebase initialization.
+
+
+
+eas build --platform android --profile production

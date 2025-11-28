@@ -4,6 +4,9 @@ module.exports = {
     slug: 'fruitzy',
     version: '1.0.0',
     orientation: 'portrait',
+    cli: {
+      appVersionSource: 'remote',
+    },
     icon: './assets/Fruitzy app Icon.png',
     userInterfaceStyle: 'automatic',
     newArchEnabled: true,
@@ -32,6 +35,9 @@ module.exports = {
     },
     plugins: ['expo-web-browser'],
     extra: {
+      eas: {
+        projectId: 'a926fead-b22c-40e1-9793-33bc51601d72',
+      },
       firebaseApiKey: process.env.FIREBASE_API_KEY,
       firebaseAuthDomain: process.env.FIREBASE_AUTH_DOMAIN,
       firebaseProjectId: process.env.FIREBASE_PROJECT_ID,
