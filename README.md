@@ -117,6 +117,32 @@ Each workspace exposes additional scripts documented in its own README once crea
 3. Run relevant workspace scripts/tests.
 4. Share for review/testing before continuing.
 
+## Building APK for Distribution
+
+To build an APK for review or distribution:
+
+1. **Install EAS CLI** (if not already installed):
+   ```bash
+   npm install -g eas-cli
+   ```
+
+2. **Login to Expo**:
+   ```bash
+   cd apps/frontend
+   eas login
+   ```
+
+3. **Build APK**:
+   ```bash
+   eas build --platform android --profile preview
+   ```
+
+4. **Download and Share**: Once build completes, download the APK and share via Google Drive, WeTransfer, or GitHub Release.
+
+📖 **Detailed Guide**: See [BUILD_APK_GUIDE.md](apps/frontend/BUILD_APK_GUIDE.md) for complete instructions.
+
+📲 **Installation Instructions**: Share [APK_INSTALLATION_INSTRUCTIONS.md](APK_INSTALLATION_INSTRUCTIONS.md) with reviewers.
+
 ## Upcoming Features
 
 - Expo + NativeWind bootstrap with theme toggle.
